@@ -1,5 +1,6 @@
 var vrDisplay, vrFrameData, vrControls, arView;
 var canvas, camera, scene, renderer, loader;
+var pages = [];
 
 /**
  * Use the `getARDisplay()` utility to leverage the WebVR API
@@ -57,6 +58,8 @@ function init() {
 	window.addEventListener('resize', onWindowResize, false);
 	// init TexutureLoader
 	loader = new THREE.TextureLoader();
+	// add Scrapbox pages
+	addPages();
 	// add lights
 	var light = new THREE.AmbientLight(0xffffff);
 	scene.add(light);
@@ -103,7 +106,7 @@ function onWindowResize() {
 }
 
 
-function putImage() {
+function addPages() {
 	// Fetch the pose data from the current frame
 	var pose = vrFrameData.pose;
 	// Convert the pose orientation and position into
@@ -126,4 +129,18 @@ function putImage() {
 	var push = new THREE.Vector3(0, 0, -1.0);
 	push.transformDirection(dirMtx);
 	pos.addScaledVector(push, 0.125);
+}
+
+function getProjectData (projectName) {
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', 'https://scrapbox.io/api/pages/' + projectName + '?limit=100');
+	xhr.onload = (e) => {
+		var projectData = JSON.parse(xhr.responseText);
+		if(projectData['count'] > 100) return projectData;
+		xhr.abort();
+		xhr.open('GET', 'https://scrapbox.io/api/pages/' + projectName + '?limit=' + projectData['count']);
+		xhr.onload = (e) => { JSON.parse(xhr.responseText) };
+		xhr.send(null);
+	}
+	xhr.send(null);
 }
