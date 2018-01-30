@@ -130,17 +130,3 @@ function addPages() {
     push.transformDirection(dirMtx);
     pos.addScaledVector(push, 0.125);
 }
-
-function getProjectData(projectName) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'https://scrapbox.io/api/pages/' + projectName + '?limit=100');
-    xhr.onload = (e) => {
-        var projectData = JSON.parse(xhr.responseText);
-        if (projectData['count'] > 100) return projectData;
-        xhr.abort();
-        xhr.open('GET', 'https://scrapbox.io/api/pages/' + projectName + '?limit=' + projectData['count']);
-        xhr.onload = (e) => { JSON.parse(xhr.responseText) };
-        xhr.send(null);
-    }
-    xhr.send(null);
-}

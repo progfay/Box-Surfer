@@ -24,10 +24,28 @@ app.get('/url2base64', function(req, res) {
     const url = decodeURIComponent(req.query.url);
     request.get(url, function(error, response, body) {
         if (!error && response.statusCode == 200) {
-            data = "data:" + response.headers["content-type"] + ";base64," + new Buffer(body).toString('base64');
+            let data = "data:" + response.headers["content-type"] + ";base64," + new Buffer(body).toString('base64');
             res.send(data);
         } else {
             res.send("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEHAAEALAAAAAABAAEAAAICTAEAOw==");
+        }
+    });
+});
+
+app.get('/projectData', function(req, res) {
+    const projectName = decodeURIComponent(req.query.project);
+    request.get('https://scrapbox.io/api/pages/' + projectName + '?limit=100', function(error, response, body) {
+        if (!error && response.statusCode == 200) {
+            let count = JSON.parse(body).count;
+            if (count <= 100) {
+                res.send(body);
+            } else {
+                request.get('https://scrapbox.io/api/pages/' + projectName + '?limit=' + count, function(error, response, _body) {
+                    res.send(!error && response.statusCode == 200 ? _body : "");
+                });
+            }
+        } else {
+            res.send("");
         }
     });
 });
