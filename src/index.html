@@ -1,101 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>Scrapbox-3DView</title>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Scrapbox-3DView</title>
 
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-body {
-	font-family: monospace;
-	margin: 0;
-	overflow: hidden;
-	position: fixed;
-	width: 100%;
-	height: 100vh;
-	-webkit-user-select: none;
-	user-select: none;
-}
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            font-family: monospace;
+            margin: 0;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100vh;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        #info {
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translate(-50%, 0);
+            margin: 1em;
+            z-index: 10;
+            display: block;
+            width: 100%;
+            line-height: 2em;
+            text-align: center;
+        }
+        
+        #info a,
+        #info .title {
+            padding: 0.4em 0.6em;
+            border-radius: 0.1em;
+        }
+        
+        #info a {
+            color: rgba(255, 255, 255, 0.8);
+            background-color: rgba(40, 40, 40, 0.6);
+            font-weight: bold;
+            text-decoration: none;
+        }
+        
+        .title {
+            color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(40, 40, 40, 0.4);
+            margin-left: 0.2em;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        form {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+    </style>
+    <style id="style-1-cropbar-clipper">
+        /* Copyright 2014 Evernote Corporation. All rights reserved. */
+        
+        .en-markup-crop-options {
+            top: 18px !important;
+            left: 50% !important;
+            margin-left: -100px !important;
+            width: 200px !important;
+            border: 2px rgba(255, 255, 255, .38) solid !important;
+            border-radius: 4px !important;
+        }
+        
+        .en-markup-crop-options div div:first-of-type {
+            margin-left: 0px !important;
+        }
+    </style>
+    <style type="text/css">
+        /* This is not a zero-length file! */
+    </style>
+    <style type="text/css">
+        /* This is not a zero-length file! */
+    </style>
+</head>
 
-	#info {
-		position: absolute;
-		left: 50%;
-		bottom: 0;
-		transform: translate(-50%, 0);
-		margin: 1em;
-		z-index: 10;
-		display: block;
-		width: 100%;
-		line-height: 2em;
-		text-align: center;
-	}
+<body>
+    <script src="./js/three.js"></script>
+    <script src="./js/VRControls.js"></script>
+    <script src="./js/three.ar.js"></script>
+    <script src="./js/main.js"></script>
 
-	#info a,
-	#info .title {
-		padding: 0.4em 0.6em;
-		border-radius: 0.1em;
-	}
-
-	#info a {
-		color: rgba(255, 255, 255, 0.8);
-		background-color: rgba(40, 40, 40, 0.6);
-		font-weight: bold;
-		text-decoration: none;
-	}
-
-	.title {
-		color: rgba(255, 255, 255, 0.9);
-		background-color: rgba(40, 40, 40, 0.4);
-		margin-left: 0.2em;
-	}
-
-	canvas {
-		position: absolute;
-		top: 0;
-		left: 0;
-	}
-
-	form {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-	}
-		</style>
-		<style id="style-1-cropbar-clipper">
-/* Copyright 2014 Evernote Corporation. All rights reserved. */
-
-.en-markup-crop-options {
-	top: 18px !important;
-	left: 50% !important;
-	margin-left: -100px !important;
-	width: 200px !important;
-	border: 2px rgba(255, 255, 255, .38) solid !important;
-	border-radius: 4px !important;
-}
-
-	.en-markup-crop-options div div:first-of-type {
-		margin-left: 0px !important;
-	}
-		</style>
-		<style type="text/css">
-/* This is not a zero-length file! */
-		</style>
-		<style type="text/css">
-/* This is not a zero-length file! */
-		</style>
-	</head>
-
-	<body>
-		<script src="./js/three.js"></script>
-		<script src="./js/VRControls.js"></script>
-		<script src="./js/three.ar.js"></script>
-		<script src="./js/main.js"></script>
-
-		<div id="lo-engage-ext-container">
-			<div data-reactroot=""></div>
-		</div>
-	</body>
+    <div id="lo-engage-ext-container">
+        <div data-reactroot=""></div>
+    </div>
+</body>
 
 </html>
