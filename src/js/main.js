@@ -107,6 +107,35 @@ function onWindowResize() {
 
 
 /**
+ * Scrapboxのプロジェクト内のページをアイコンにしてsceneに追加する。
+ * @param {JSON Object} projectData Scrapboxのプロジェクトデータ
+ */
+function addPageIcons(projectData) {
+    let pages = projectData.pages;
+    let loader = new THREE.TextureLoader();
+
+    for (page in pages) {
+        loader.load(getImageFromURL(page.image),
+            (tex) => {
+                let w = 0.08;
+                let h = tex.image.height / (tex.image.width / 0.08);
+                if (h > 0.06) {
+                    h = 0.06;
+                    w = tex.image.width / (tex.image.height / 0.06);
+                }
+                let image = new THREE.Mesh(
+                    new THREE.BoxGeometry(w, h, 0.0005),
+                    new THREE.MeshLambertMaterial({ map: tex })
+                );
+                image.position.set(Math.random() - 0.5, camera.position.y - 0.25, Math.random() - 0.5);
+                image.rotation.y = THREE.Math.degToRad(90);
+                scene.add(image);
+            });
+    }
+}
+
+
+/**
  * 指定したScrapboxのプロジェクトのデータを取得します。
  * @param {String} projectName Scrapboxのプロジェクト名
  * @returns {JSON Object}
