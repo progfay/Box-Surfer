@@ -137,3 +137,10 @@ function getProjectData(projectName) {
     xhr.onload = (e) => { return JSON.parse(xhr.responseText) };
     xhr.send(null);
 }
+
+function getImageFromURL(url) {
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET', '/url2base64?url=' + encodeURIComponent(url));
+    xhr.onload = (e) => { return xhr.responseText };
+    xhr.send(null);
+}
