@@ -40,9 +40,10 @@ app.get('/projectData', function(req, res) {
             if (count <= 100) {
                 res.send(body);
             } else {
-                request.get('https://scrapbox.io/api/pages/' + projectName + '?limit=' + count, function(error, response, _body) {
-                    res.send(!error && response.statusCode == 200 ? _body : "");
-                });
+                request.get(
+                    'https://scrapbox.io/api/pages/' + projectName + '?limit=' + count,
+                    (error, response, _body) => { res.send(!error && response.statusCode == 200 ? _body : "") }
+                );
             }
         } else {
             res.send("");
