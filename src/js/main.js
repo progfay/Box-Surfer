@@ -1,6 +1,6 @@
-var vrDisplay, vrFrameData, vrControls, arView;
-var canvas, camera, scene, renderer, loader;
-var pages = [];
+let vrDisplay, vrFrameData, vrControls, arView;
+let canvas, camera, scene, renderer, loader;
+let pages = [];
 
 /**
  * Use the `getARDisplay()` utility to leverage the WebVR API
@@ -21,7 +21,7 @@ THREE.ARUtils.getARDisplay().then(function(display) {
 
 function init() {
     // Turn on the debugging panel
-    var arDebug = new THREE.ARDebug(vrDisplay);
+    let arDebug = new THREE.ARDebug(vrDisplay);
     document.body.appendChild(arDebug.getElement());
     // Setup the three.js rendering environment
     renderer = new THREE.WebGLRenderer({
@@ -61,7 +61,7 @@ function init() {
     // add Scrapbox pages
     addPages();
     // add lights
-    var light = new THREE.AmbientLight(0xffffff);
+    let light = new THREE.AmbientLight(0xffffff);
     scene.add(light);
     // Kick off the render loop!
     update();
@@ -108,25 +108,25 @@ function onWindowResize() {
 
 function addPages() {
     // Fetch the pose data from the current frame
-    var pose = vrFrameData.pose;
+    let pose = vrFrameData.pose;
     // Convert the pose orientation and position into
     // THREE.Quaternion and THREE.Vector3 respectively
-    var ori = new THREE.Quaternion(
+    let ori = new THREE.Quaternion(
         pose.orientation[0],
         pose.orientation[1],
         pose.orientation[2],
         pose.orientation[3]
     );
-    var pos = new THREE.Vector3(
+    let pos = new THREE.Vector3(
         pose.position[0],
         pose.position[1],
         pose.position[2]
     );
 
-    var dirMtx = new THREE.Matrix4();
+    let dirMtx = new THREE.Matrix4();
     dirMtx.makeRotationFromQuaternion(ori);
 
-    var push = new THREE.Vector3(0, 0, -1.0);
+    let push = new THREE.Vector3(0, 0, -1.0);
     push.transformDirection(dirMtx);
     pos.addScaledVector(push, 0.125);
 }
