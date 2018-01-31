@@ -106,32 +106,6 @@ function onWindowResize() {
 }
 
 
-function addPages() {
-    // Fetch the pose data from the current frame
-    let pose = vrFrameData.pose;
-    // Convert the pose orientation and position into
-    // THREE.Quaternion and THREE.Vector3 respectively
-    let ori = new THREE.Quaternion(
-        pose.orientation[0],
-        pose.orientation[1],
-        pose.orientation[2],
-        pose.orientation[3]
-    );
-    let pos = new THREE.Vector3(
-        pose.position[0],
-        pose.position[1],
-        pose.position[2]
-    );
-
-    let dirMtx = new THREE.Matrix4();
-    dirMtx.makeRotationFromQuaternion(ori);
-
-    let push = new THREE.Vector3(0, 0, -1.0);
-    push.transformDirection(dirMtx);
-    pos.addScaledVector(push, 0.125);
-}
-
-
 /**
  * 指定したScrapboxのプロジェクトのデータを取得します。
  * @param {String} projectName Scrapboxのプロジェクト名
