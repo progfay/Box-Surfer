@@ -130,3 +130,10 @@ function addPages() {
     push.transformDirection(dirMtx);
     pos.addScaledVector(push, 0.125);
 }
+
+function getProjectData(projectName) {
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET', '/projectData?project=' + projectName);
+    xhr.onload = (e) => { return JSON.parse(xhr.responseText) };
+    xhr.send(null);
+}
