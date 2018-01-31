@@ -131,6 +131,12 @@ function addPages() {
     pos.addScaledVector(push, 0.125);
 }
 
+
+/**
+ * 指定したScrapboxのプロジェクトのデータを取得します。
+ * @param {String} projectName Scrapboxのプロジェクト名
+ * @returns {JSON Object}
+ */
 function getProjectData(projectName) {
     let xhr = new XMLHttpRequest();
     xhr.open('GET', '/projectData?project=' + projectName);
@@ -138,6 +144,12 @@ function getProjectData(projectName) {
     xhr.send(null);
 }
 
+
+/**
+ * 画像のURLから、Base64形式で画像を取得します。
+ * @param {String} url 画像のURL
+ * @returns {String} Base64
+ */
 function getImageFromURL(url) {
     let xhr = new XMLHttpRequest();
     xhr.open('GET', '/url2base64?url=' + encodeURIComponent(url));
