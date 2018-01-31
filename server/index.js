@@ -18,7 +18,6 @@ app.use(express.static(__dirname + './../src', {
     }
 }));
 
-// app.use('/root', express.static(__dirname + './../src'));
 
 /*
  * get base64 image from image url
