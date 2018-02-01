@@ -22,6 +22,7 @@ app.use(express.static(__dirname + './../src', {
 /*
  * get base64 image from image url
  * on error, return empty base64 image
+ * (query) url: image url
  */
 app.get('/url2base64', function(req, res) {
     const url = decodeURIComponent(req.query.url);
@@ -39,6 +40,7 @@ app.get('/url2base64', function(req, res) {
 /*
  * get Scrapbox's project data by project name
  * on error, return empty String
+ * (query) project: project Name
  */
 app.get('/projectData', function(req, res) {
     const projectName = decodeURIComponent(req.query.project);
