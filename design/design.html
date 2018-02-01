@@ -19,13 +19,10 @@
         makeCard("おにぎりを食べる🍙");
     }
 
-    function makeCard(title) {
+    function makeCard(title, imgPath) {
         background(0xFFFFFF);
         textSize(30);
-        for (let size = 30; textWidth(title) > 400 || size < 1; size--) {
-            textSize(size);
-            console.log(size + ' ' + textWidth(title));
-        }
+        for (let size = 30; textWidth(title) > 400 || size < 1; size--) textSize(size);
         text(title, 0, 0, 400, 100);
     }
 
