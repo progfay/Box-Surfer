@@ -159,3 +159,14 @@ function getImageFromURL(url) {
     xhr.onload = (e) => { return xhr.responseText };
     xhr.send(null);
 }
+
+
+/**
+ * サーバとなっているPCで指定のURLを開きます。
+ * @param {String} url 開くURL
+ */
+function openURL(url) {
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET', '/open?url=' + encodeURIComponent(url));
+    xhr.send(null);
+}
