@@ -1,6 +1,7 @@
 const express = require('express');
 const request = require('request').defaults({ encoding: null });
 const URLSafeBase64 = require('urlsafe-base64');
+const open = require('open');
 
 let defaultPort = 8000;
 
@@ -59,4 +60,14 @@ app.get('/projectData', function(req, res) {
             res.send("");
         }
     });
+});
+
+
+/*
+ * open url page in servered PC
+ * (query) url : open url
+ */
+app.get('/open', function(req, res) {
+    open(decodeURIComponent(req.query.url));
+    res.send('');
 });

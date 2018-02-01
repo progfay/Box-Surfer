@@ -7,7 +7,7 @@ AR技術を用いて [Scrapbox](https://scrapbox.io/) のプロジェクト内�
 # Prepare
 
 ```bash
-npm install express request urlsafe-base64
+npm install express request urlsafe-base64 open
 ```
 
 
