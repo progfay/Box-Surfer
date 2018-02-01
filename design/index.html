@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./p5.min.js"></script>
+</head>
+
+<body class="class">
+</body>
+
+<script>
+    function setup() {
+        createCanvas(400, 400);
+        textAlign(CENTER, CENTER);
+        makeCard("おにぎりを食べる🍙");
+    }
+
+    function makeCard(title) {
+        background(0xFFFFFF);
+        textSize(30);
+        for (let size = 30; textWidth(title) > 400 || size < 1; size--) {
+            textSize(size);
+            console.log(size + ' ' + textWidth(title));
+        }
+        text(title, 0, 0, 400, 100);
+    }
+
+    // let canvas = document.createElement("canvas");
+    // canvas.className = 'card';
+    // let ctx = canvas.getContext("2d");
+    // ctx.font = "30px 'ＭＳ Ｐゴシック'";
+    // ctx.textAlign = "center";
+    // ctx.textBaseline = "middle";
+    // ctx.fillText("hogefugapiyo", 200, 50);
+
+    // // let title = document.createElement("div");
+    // // title.className = 'title';
+    // // title.innerHTML = "<p>Here is Title</p>";
+
+
+    // // let image = document.createElement("div");
+    // // image.className = 'image';
+
+    // // canvas.appendChild(title);
+    // // canvas.appendChild(image);
+    // document.body.appendChild(canvas);
+</script>
+
+</html>
