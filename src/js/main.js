@@ -156,12 +156,12 @@ function addPageIcons(projectData) {
 /**
  * 指定したScrapboxのプロジェクトのデータを取得します。
  * @param {String} projectName Scrapboxのプロジェクト名
- * @returns {JSON Object}
+ * @param {function} callback プロジェクトのデータ (@code{JSON Object}) を引数としたコールバック関数
  */
 function getProjectData(projectName) {
     xhr.abort();
     xhr.open('GET', '/projectData?project=' + projectName);
-    xhr.onload = (e) => { return JSON.parse(xhr.responseText) };
+    xhr.onload = (e) => { callback(JSON.parse(xhr.responseText)) };
     xhr.send(null);
 }
 
@@ -169,12 +169,12 @@ function getProjectData(projectName) {
 /**
  * 画像のURLから、Base64形式で画像を取得します。
  * @param {String} url 画像のURL
- * @returns {String} Base64
+ * @param {function} callback @code{img} (Base64形式) を引数としたコールバック関数
  */
 function getImageFromURL(url) {
     xhr.abort();
     xhr.open('GET', '/url2base64?url=' + encodeURIComponent(url));
-    xhr.onload = (e) => { return xhr.responseText };
+    xhr.onload = (e) => { callback(xhr.responseText) };
     xhr.send(null);
 }
 
