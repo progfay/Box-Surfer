@@ -1,6 +1,11 @@
 let vrDisplay, vrFrameData, vrControls, arView;
 let canvas, camera, scene, renderer, loader;
+let xhr;
+
 let pages = [];
+const cardWidth = 400;
+const titleHeight = 100;
+const imageHeight = 300;
 
 /**
  * Use the `getARDisplay()` utility to leverage the WebVR API
@@ -63,8 +68,22 @@ function init() {
     // add lights
     let light = new THREE.AmbientLight(0xffffff);
     scene.add(light);
+    // XMLHttpRewuest
+    xhr = new XMLHttpRequest();
     // Kick off the render loop!
     update();
+}
+
+
+/**
+ * setup for p5.js.
+ * function @code{draw()} don't kick off.
+ */
+function setup() {
+    createCanvas(cardWidth, titleHeight + imageHeight);
+    textAlign(CENTER, CENTER);
+    imageMode(CENTER);
+    noLoop();
 }
 
 
@@ -112,7 +131,6 @@ function onWindowResize() {
  */
 function addPageIcons(projectData) {
     let pages = projectData.pages;
-    let loader = new THREE.TextureLoader();
 
     for (page in pages) {
         loader.load(getImageFromURL(page.image),
@@ -141,7 +159,7 @@ function addPageIcons(projectData) {
  * @returns {JSON Object}
  */
 function getProjectData(projectName) {
-    let xhr = new XMLHttpRequest();
+    xhr.abort();
     xhr.open('GET', '/projectData?project=' + projectName);
     xhr.onload = (e) => { return JSON.parse(xhr.responseText) };
     xhr.send(null);
@@ -154,7 +172,7 @@ function getProjectData(projectName) {
  * @returns {String} Base64
  */
 function getImageFromURL(url) {
-    let xhr = new XMLHttpRequest();
+    xhr.abort();
     xhr.open('GET', '/url2base64?url=' + encodeURIComponent(url));
     xhr.onload = (e) => { return xhr.responseText };
     xhr.send(null);
@@ -166,7 +184,30 @@ function getImageFromURL(url) {
  * @param {String} url 開くURL
  */
 function openURL(url) {
-    let xhr = new XMLHttpRequest();
+    xhr.abort();
     xhr.open('GET', '/open?url=' + encodeURIComponent(url));
     xhr.send(null);
+}
+
+/**
+ * タイトルと画像の描画されたカードの画像を生成します。
+ * @param {String} title カードに描画するタイトル
+ * @param {String} imgURL カードに描画する画像のURL
+ * @return {String} Base64形式のカードの画像
+ */
+function getCardImage(title, imgURL) {
+    background(0xFFFFFF);
+    textSize(30);
+    for (let size = 30; textWidth(title) > cardWidth || size < 1; size--) textSize(size);
+    text(title, 0, 0, cardWidth, titleHeight);
+    let img = loadImage(getImageFromURL(imgURL), (img) => {
+        let w = cardWidth;
+        let h = img.height * img.width / cardWidth;
+        if (h > imageHeight) {
+            w = img.width * img.height / imageHeight;
+            h = imageHeight;
+        }
+        image(img, cardWidth * 0.5, titleHeight + imageHeight * 0.5, w, h);
+        return canvas.toDataURL("image/png");
+    });
 }
