@@ -3,6 +3,8 @@ let canvas, camera, scene, renderer, loader;
 let xhr;
 
 let pages = [];
+let cardGeometry;
+
 const cardWidth = 400;
 const titleHeight = 100;
 const imageHeight = 300;
@@ -126,6 +128,26 @@ function onWindowResize() {
 
 
 /**
+ * カードの画像からカードのMeshを生成します。
+ * @param {String} img カードの画像 (base64形式)
+ * @return {Three.Mesh} カードのMesh
+ */
+function createCard(image) {
+    loader.load(image,
+        (tex) => {
+            let card = new THREE.Mesh(
+                cardGeometry,
+                new THREE.MeshLambertMaterial({ map: tex })
+            );
+            card.position.set(Math.random() - 0.5, camera.position.y - 0.25, Math.random() - 0.5);
+            card.rotation.y = THREE.Math.degToRad(90);
+            return card;
+        });
+}
+
+
+
+/**
  * Scrapboxのプロジェクト内のページをアイコンにしてsceneに追加する。
  * @param {JSON Object} projectData Scrapboxのプロジェクトデータ
  */
@@ -158,7 +180,7 @@ function addPageIcons(projectData) {
  * @param {String} projectName Scrapboxのプロジェクト名
  * @param {function} callback プロジェクトのデータ (@code{JSON Object}) を引数としたコールバック関数
  */
-function getProjectData(projectName) {
+function getProjectData(projectName, callback) {
     xhr.abort();
     xhr.open('GET', '/projectData?project=' + projectName);
     xhr.onload = (e) => { callback(JSON.parse(xhr.responseText)) };
@@ -171,7 +193,7 @@ function getProjectData(projectName) {
  * @param {String} url 画像のURL
  * @param {function} callback @code{img} (Base64形式) を引数としたコールバック関数
  */
-function getImageFromURL(url) {
+function getImageFromURL(url, callback) {
     xhr.abort();
     xhr.open('GET', '/url2base64?url=' + encodeURIComponent(url));
     xhr.onload = (e) => { callback(xhr.responseText) };
