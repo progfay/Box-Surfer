@@ -1,5 +1,5 @@
 let vrDisplay, vrFrameData, vrControls, arView;
-let canvas, camera, scene, renderer, loader;
+let ARcanvas, camera, scene, renderer, loader;
 
 let pages = [];
 let cardGeometry;
@@ -34,8 +34,8 @@ function init() {
     console.log('setRenderer size', window.innerWidth, window.innerHeight);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.autoClear = false;
-    canvas = renderer.domElement;
-    document.body.appendChild(canvas);
+    ARcanvas = renderer.domElement;
+    document.body.appendChild(ARcanvas);
     scene = new THREE.Scene();
     // Creating the ARView, which is the object that handles
     // the rendering of the camera stream behind the three.js
