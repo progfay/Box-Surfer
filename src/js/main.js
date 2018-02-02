@@ -2,12 +2,11 @@ let vrDisplay, vrFrameData, vrControls, arView;
 let ARcanvas, camera, scene, renderer, loader;
 
 let pages = [];
-let cardGeometry;
 
 let p5canvas;
-const cardWidth = 400;
-const titleHeight = 100;
-const imageHeight = 300;
+const cardWidth = 200;
+const titleHeight = 50;
+const imageHeight = 150;
 
 /**
  * Use the `getARDisplay()` utility to leverage the WebVR API
@@ -69,9 +68,13 @@ function init() {
     loader = new THREE.TextureLoader();
     // p5.js setup
     p5canvas = createCanvas(cardWidth, titleHeight + imageHeight);
+    p5canvas.canvas.style.display = 'none';
     textAlign(CENTER, CENTER);
     imageMode(CENTER);
-    openURL('https://scrapbox.io/progfay-pub/');
+    // add card
+    getCardImage('progfay', 'https://i.gyazo.com/4ac7810705ef9c50a56d04f41a39b065.png', (cardImage) => {
+        let cardMesh = addCard(cardImage);
+    });
     // add lights
     let light = new THREE.AmbientLight(0xffffff);
     scene.add(light);
@@ -121,19 +124,19 @@ function onWindowResize() {
  * @param {String} img カードの画像 (base64形式)
  * @return {Three.Mesh} カードのMesh
  */
-function createCard(image) {
+function addCard(image) {
     loader.load(image,
         (tex) => {
             let card = new THREE.Mesh(
-                cardGeometry,
+                new THREE.BoxGeometry(0.08, 0.08, 0.0005),
                 new THREE.MeshLambertMaterial({ map: tex })
             );
             card.position.set(Math.random() - 0.5, camera.position.y - 0.25, Math.random() - 0.5);
             card.rotation.y = THREE.Math.degToRad(90);
-            return card;
+            // pages.push(card);
+            scene.add(card);
         });
 }
-
 
 
 /**
@@ -205,21 +208,23 @@ function openURL(url) {
  * タイトルと画像の描画されたカードの画像を生成します。
  * @param {String} title カードに描画するタイトル
  * @param {String} imgURL カードに描画する画像のURL
- * @return {String} Base64形式のカードの画像
+ * @param {function} callback カードの画像 (Base64形式) を引数としたコールバック関数
  */
-function getCardImage(title, imgURL) {
-    background(0xFFFFFF);
+function getCardImage(title, imgURL, callback) {
+    background('#EEEEFF');
     textSize(30);
     for (let size = 30; textWidth(title) > cardWidth || size < 1; size--) textSize(size);
     text(title, 0, 0, cardWidth, titleHeight);
-    let img = loadImage(getImageFromURL(imgURL), (img) => {
-        let w = cardWidth;
-        let h = img.height * img.width / cardWidth;
-        if (h > imageHeight) {
-            w = img.width * img.height / imageHeight;
-            h = imageHeight;
-        }
-        image(img, cardWidth * 0.5, titleHeight + imageHeight * 0.5, w, h);
-        return canvas.toDataURL("image/png");
+    getImageFromURL(imgURL, (base64) => {
+        loadImage(base64, (img) => {
+            let w = cardWidth;
+            let h = img.height * cardWidth / img.width;
+            if (h > imageHeight) {
+                w = img.width * imageHeight / img.height;
+                h = imageHeight;
+            }
+            image(img, cardWidth * 0.5, titleHeight + imageHeight * 0.5, w, h);
+            callback(p5canvas.canvas.toDataURL("image/png"));
+        });
     });
 }
