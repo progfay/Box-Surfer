@@ -27,9 +27,6 @@ THREE.ARUtils.getARDisplay().then(function(display) {
 
 
 function init() {
-    // Turn on the debugging panel
-    let arDebug = new THREE.ARDebug(vrDisplay);
-    document.body.appendChild(arDebug.getElement());
     // Setup the three.js rendering environment
     renderer = new THREE.WebGLRenderer({
         alpha: true
