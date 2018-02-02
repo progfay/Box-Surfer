@@ -4,6 +4,7 @@ let ARcanvas, camera, scene, renderer, loader;
 let pages = [];
 let cardGeometry;
 
+let p5canvas;
 const cardWidth = 400;
 const titleHeight = 100;
 const imageHeight = 300;
@@ -14,15 +15,20 @@ const imageHeight = 300;
  * a valid display if found. Otherwise, display the unsupported
  * browser message.
  */
-THREE.ARUtils.getARDisplay().then(function(display) {
-    if (display) {
-        vrFrameData = new VRFrameData();
-        vrDisplay = display;
-        init();
-    } else {
-        THREE.ARUtils.displayUnsupportedMessage();
-    }
-});
+function setup() {
+    noLoop();
+    THREE.ARUtils.getARDisplay().then(function(display) {
+        if (display) {
+            vrFrameData = new VRFrameData();
+            vrDisplay = display;
+            init();
+            // Kick off the render loop!
+            update();
+        } else {
+            THREE.ARUtils.displayUnsupportedMessage();
+        }
+    });
+}
 
 
 function init() {
@@ -61,25 +67,14 @@ function init() {
     window.addEventListener('resize', onWindowResize, false);
     // init TexutureLoader
     loader = new THREE.TextureLoader();
-    // add Scrapbox pages
-    addPages();
+    // p5.js setup
+    p5canvas = createCanvas(cardWidth, titleHeight + imageHeight);
+    textAlign(CENTER, CENTER);
+    imageMode(CENTER);
+    openURL('https://scrapbox.io/progfay-pub/');
     // add lights
     let light = new THREE.AmbientLight(0xffffff);
     scene.add(light);
-    // Kick off the render loop!
-    update();
-}
-
-
-/**
- * setup for p5.js.
- * function @code{draw()} don't kick off.
- */
-function setup() {
-    createCanvas(cardWidth, titleHeight + imageHeight);
-    textAlign(CENTER, CENTER);
-    imageMode(CENTER);
-    noLoop();
 }
 
 
@@ -144,6 +139,7 @@ function createCard(image) {
 /**
  * Scrapboxのプロジェクト内のページをアイコンにしてsceneに追加する。
  * @param {JSON Object} projectData Scrapboxのプロジェクトデータ
+ * @deprecated
  */
 function addPageIcons(projectData) {
     let pages = projectData.pages;
