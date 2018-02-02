@@ -1,6 +1,5 @@
 let vrDisplay, vrFrameData, vrControls, arView;
 let canvas, camera, scene, renderer, loader;
-let xhr;
 
 let pages = [];
 let cardGeometry;
@@ -67,8 +66,6 @@ function init() {
     // add lights
     let light = new THREE.AmbientLight(0xffffff);
     scene.add(light);
-    // XMLHttpRewuest
-    xhr = new XMLHttpRequest();
     // Kick off the render loop!
     update();
 }
@@ -178,7 +175,7 @@ function addPageIcons(projectData) {
  * @param {function} callback プロジェクトのデータ (@code{JSON Object}) を引数としたコールバック関数
  */
 function getProjectData(projectName, callback) {
-    xhr.abort();
+    let xhr = new XMLHttpRequest();
     xhr.open('GET', '/projectData?project=' + projectName);
     xhr.onload = (e) => { callback(JSON.parse(xhr.responseText)) };
     xhr.send(null);
@@ -191,7 +188,7 @@ function getProjectData(projectName, callback) {
  * @param {function} callback @code{img} (Base64形式) を引数としたコールバック関数
  */
 function getImageFromURL(url, callback) {
-    xhr.abort();
+    let xhr = new XMLHttpRequest();
     xhr.open('GET', '/url2base64?url=' + encodeURIComponent(url));
     xhr.onload = (e) => { callback(xhr.responseText) };
     xhr.send(null);
@@ -203,7 +200,7 @@ function getImageFromURL(url, callback) {
  * @param {String} url 開くURL
  */
 function openURL(url) {
-    xhr.abort();
+    let xhr = new XMLHttpRequest();
     xhr.open('GET', '/open?url=' + encodeURIComponent(url));
     xhr.send(null);
 }
