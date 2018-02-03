@@ -1,5 +1,5 @@
 let vrDisplay, vrFrameData, vrControls, arView;
-let ARcanvas, camera, scene, renderer, loader;
+let ARcanvas, camera, scene, renderer;
 
 let pages = [];
 
@@ -70,9 +70,6 @@ function init() {
 
     // Bind our event handlers
     window.addEventListener('resize', onWindowResize, false);
-
-    // init TexutureLoader
-    loader = new THREE.TextureLoader();
 
     // p5.js setup
     p5canvas = createCanvas(cardWidth, titleHeight + imageHeight);
