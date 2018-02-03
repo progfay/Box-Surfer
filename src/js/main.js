@@ -193,6 +193,19 @@ function getProjectData(projectName, callback) {
     xhr.send(null);
 }
 
+/**
+ * 指定したScrapboxのページのデータを取得します。
+ * @param {String} projectName Scrapboxのプロジェクト名
+ * @param {String} pageName Scrapboxのページ名
+ * @param {function} callback ページのデータ (@code{JSON Object}) を引数としたコールバック関数
+ */
+function getPageData(projectName, pageName, callback) {
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET', '/pageData?project=' + projectName + '&page=' + pageName);
+    xhr.onload = (e) => { callback(JSON.parse(xhr.responseText)) };
+    xhr.send(null);
+}
+
 
 /**
  * 画像のURLから、Base64形式で画像を取得します。
