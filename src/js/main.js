@@ -5,7 +5,7 @@ let pages = [];
 const cardWidth = 200;
 const titleHeight = 50;
 const imageHeight = 150;
-const projectName = 'progfay-pub';
+let projectName;
 
 let raycaster, mouse;
 
@@ -68,6 +68,10 @@ function init() {
     // orientation/position to the perspective camera, keeping our
     // real world and virtual world in sync.
     vrControls = new THREE.VRControls(camera);
+
+    // set GET Request query `project`
+    var query = location.search.substring(1, location.search.length).match(/project=[^&]*/);
+    projectName = query ? (query[0] ? query[0].toString().split('=')[1] : 'help-jp') : 'help-jp';
 
     // setup for judging Mesh touch valiables
     raycaster = new THREE.Raycaster();
