@@ -7,6 +7,8 @@ const titleHeight = 50;
 const imageHeight = 150;
 const projectName = 'progfay-pub';
 
+let raycaster, mouse;
+
 /**
  * Use the `getARDisplay()` utility to leverage the WebVR API
  * to see if there are any AR-capable WebVR VRDisplays. Returns
@@ -67,8 +69,13 @@ function init() {
     // real world and virtual world in sync.
     vrControls = new THREE.VRControls(camera);
 
+    // setup for judging Mesh touch valiables
+    raycaster = new THREE.Raycaster();
+    mouse = new THREE.Vector2();
+
     // Bind our event handlers
     window.addEventListener('resize', onWindowResize, false);
+    window.addEventListener('touchstart', onTouchStart, false);
 
     // add cards
     getProjectData(projectName, (projectData) => {
@@ -125,6 +132,30 @@ function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
+/**
+ * On window touch, open card link in servered PC.
+ */
+function onTouchStart(event) {
+    // stopping event propagation
+    event.preventDefault();
+
+    // get touched position in window
+    let touchObject = event.changedTouches[0];
+
+    // get touch position
+    mouse.x = (touchObject.pageX / window.innerWidth) * 2 - 1;
+    mouse.y = -(touchObject.pageY / window.innerHeight) * 2 + 1;
+
+    // get object that cross ray
+    raycaster.setFromCamera(mouse, camera);
+    var intersects = raycaster.intersectObjects(pages);
+
+    // open touched card link in servered PC
+    if (intersects.length > 0) {
+        openURL('https://scrapbox.io/' + projectName + '/' + intersects[0].object.title);
+    }
+}
+
 
 /**
  * タイトルと画像の描画されたカードカードのMeshを生成し、@code{scene}と@code{pages}に追加します。
@@ -174,7 +205,8 @@ function addCard(payload, callback) {
                     card.rotation.y = THREE.Math.degToRad(90);
 
                     card.links = links;
-                    pages[title] = card;
+                    card.title = title;
+                    pages.push(card);
                     scene.add(card);
                 });
             }
