@@ -82,7 +82,14 @@ function init() {
     imageMode(CENTER);
 
     // add card
-    getPageData('progfay-pub', 'progfay', (pageData) => { addCard(pageData) })
+    let projectName = 'progfay-pub';
+    getProjectData(projectName, (projectData) => {
+        let pages = projectData.pages;
+        for (let i = 0; i < pages.length; i++) {
+            openURL('https://scrapbox.io/' + projectName + '/' + pages[i].title);
+            getPageData(projectName, pages[i].title, (pageData) => { addCard(pageData) });
+        }
+    });
 
     // add lights
     let light = new THREE.AmbientLight(0xffffff);
