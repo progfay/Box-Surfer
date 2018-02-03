@@ -71,6 +71,21 @@ app.get('/projectData', function(req, res) {
 
 
 /*
+ * get Scrapbox's page data by project name and page name
+ * on error, return empty String
+ * (query) project: project Name
+ * (query) page: page Name
+ */
+app.get('/pageData', function(req, res) {
+    const projectName = decodeURIComponent(req.query.project);
+    const pageName = decodeURIComponent(req.query.page);
+    request.get('https://scrapbox.io/api/pages/' + projectName + '/' + pageName, function(error, response, body) {
+        res.send(!error && response.statusCode == 200 ? body : "");
+    });
+});
+
+
+/*
  * open url page in servered PC
  * (query) url : open url
  */
