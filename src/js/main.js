@@ -16,6 +16,7 @@ const imageHeight = 150;
  */
 function setup() {
     noLoop();
+
     THREE.ARUtils.getARDisplay().then(function(display) {
         if (display) {
             vrFrameData = new VRFrameData();
@@ -36,16 +37,19 @@ function init() {
         alpha: true
     });
     renderer.setPixelRatio(window.devicePixelRatio);
-    console.log('setRenderer size', window.innerWidth, window.innerHeight);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.autoClear = false;
+
     ARcanvas = renderer.domElement;
     document.body.appendChild(ARcanvas);
+
     scene = new THREE.Scene();
+
     // Creating the ARView, which is the object that handles
     // the rendering of the camera stream behind the three.js
     // scene
     arView = new THREE.ARView(vrDisplay, renderer);
+
     // The ARPerspectiveCamera is very similar to THREE.PerspectiveCamera,
     // except when using an AR-capable browser, the camera uses
     // the projection matrix provided from the device, so that the
@@ -58,23 +62,29 @@ function init() {
         vrDisplay.depthNear,
         vrDisplay.depthFar
     );
+
     // VRControls is a utility from three.js that applies the device's
     // orientation/position to the perspective camera, keeping our
     // real world and virtual world in sync.
     vrControls = new THREE.VRControls(camera);
+
     // Bind our event handlers
     window.addEventListener('resize', onWindowResize, false);
+
     // init TexutureLoader
     loader = new THREE.TextureLoader();
+
     // p5.js setup
     p5canvas = createCanvas(cardWidth, titleHeight + imageHeight);
     p5canvas.canvas.style.display = 'none';
     textAlign(CENTER, CENTER);
     imageMode(CENTER);
+
     // add card
     addCard({
         title: 'progfay'
     });
+
     // add lights
     let light = new THREE.AmbientLight(0xffffff);
     scene.add(light);
@@ -89,17 +99,22 @@ function update() {
     // Render the device's camera stream on screen first of all.
     // It allows to get the right pose synchronized with the right frame.
     arView.render();
+
     // Update our camera projection matrix in the event that
     // the near or far planes have updated
     camera.updateProjectionMatrix();
+
     // From the WebVR API, populate `vrFrameData` with
     // updated information for the frame
     vrDisplay.getFrameData(vrFrameData);
+
     // Update our perspective camera's positioning
     vrControls.update();
+
     // Render our three.js virtual scene
     renderer.clearDepth();
     renderer.render(scene, camera);
+
     // Kick off the requestAnimationFrame to call this function
     // on the next frame
     requestAnimationFrame(update);
@@ -112,7 +127,6 @@ function update() {
  * projection matrix provided from the device
  */
 function onWindowResize() {
-    console.log('setRenderer size', window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
