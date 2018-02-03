@@ -139,8 +139,7 @@ function onWindowResize() {
  */
 function addCard(payload, callback) {
     let set = new Set(payload.links);
-    let relatedPages = payload.relatedPages.links1hop;
-    for (page in relatedPages) {
+    for (page in payload.relatedPages.links1hop) {
         set.add(page.title);
     }
 
