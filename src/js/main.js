@@ -120,6 +120,32 @@ function onWindowResize() {
 
 
 /**
+ * タイトルと画像の描画されたカードの画像を生成します。
+ * @param {String} title カードに描画するタイトル
+ * @param {String} imgURL カードに描画する画像のURL
+ * @param {function} callback カードの画像 (Base64形式) を引数としたコールバック関数
+ */
+function getCardImage(title, imgURL, callback) {
+    background('#EEEEFF');
+    textSize(30);
+    for (let size = 30; textWidth(title) > cardWidth || size < 1; size--) textSize(size);
+    text(title, 0, 0, cardWidth, titleHeight);
+    getImageFromURL(imgURL, (base64) => {
+        loadImage(base64, (img) => {
+            let w = cardWidth;
+            let h = img.height * cardWidth / img.width;
+            if (h > imageHeight) {
+                w = img.width * imageHeight / img.height;
+                h = imageHeight;
+            }
+            image(img, cardWidth * 0.5, titleHeight + imageHeight * 0.5, w, h);
+            callback(p5canvas.canvas.toDataURL("image/png"));
+        });
+    });
+}
+
+
+/**
  * カードの画像からカードのMeshを生成します。
  * @param {String} img カードの画像 (base64形式)
  * @return {Three.Mesh} カードのMesh
@@ -173,29 +199,4 @@ function openURL(url) {
     let xhr = new XMLHttpRequest();
     xhr.open('GET', '/open?url=' + encodeURIComponent(url));
     xhr.send(null);
-}
-
-/**
- * タイトルと画像の描画されたカードの画像を生成します。
- * @param {String} title カードに描画するタイトル
- * @param {String} imgURL カードに描画する画像のURL
- * @param {function} callback カードの画像 (Base64形式) を引数としたコールバック関数
- */
-function getCardImage(title, imgURL, callback) {
-    background('#EEEEFF');
-    textSize(30);
-    for (let size = 30; textWidth(title) > cardWidth || size < 1; size--) textSize(size);
-    text(title, 0, 0, cardWidth, titleHeight);
-    getImageFromURL(imgURL, (base64) => {
-        loadImage(base64, (img) => {
-            let w = cardWidth;
-            let h = img.height * cardWidth / img.width;
-            if (h > imageHeight) {
-                w = img.width * imageHeight / img.height;
-                h = imageHeight;
-            }
-            image(img, cardWidth * 0.5, titleHeight + imageHeight * 0.5, w, h);
-            callback(p5canvas.canvas.toDataURL("image/png"));
-        });
-    });
 }
