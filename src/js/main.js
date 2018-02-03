@@ -77,6 +77,7 @@ function init() {
     // p5.js setup
     p5canvas = createCanvas(cardWidth, titleHeight + imageHeight);
     p5canvas.canvas.style.display = 'none';
+    p5canvas.canvas.style.borderRadius = '5px';
     textAlign(CENTER, CENTER);
     imageMode(CENTER);
 
