@@ -72,7 +72,7 @@ function init() {
     textAlign(CENTER, CENTER);
     imageMode(CENTER);
     // add card
-    getCardImage('progfay', 'https://i.gyazo.com/4ac7810705ef9c50a56d04f41a39b065.png', (cardImage) => {
+    createCardImage('progfay', 'https://i.gyazo.com/4ac7810705ef9c50a56d04f41a39b065.png', (cardImage) => {
         let cardMesh = addCard(cardImage);
     });
     // add lights
@@ -121,24 +121,37 @@ function onWindowResize() {
 
 /**
  * タイトルと画像の描画されたカードの画像を生成します。
- * @param {String} title カードに描画するタイトル
- * @param {String} imgURL カードに描画する画像のURL
+ * @param {JSON Object} payload ページのJSONデータ
  * @param {function} callback カードの画像 (Base64形式) を引数としたコールバック関数
  */
-function getCardImage(title, imgURL, callback) {
+function createCardImage(payload, callback) {
+    let set = new Set(payload.links);
+    let relatedPages = payload.relatedPages.links1hop;
+    for (page in relatedPages) {
+        set.add(page.title);
+    }
+
+    let links = Array.from(set);
+    let title = payload.title;
+    let image = payload.image;
+
     background('#EEEEFF');
+
     textSize(30);
-    for (let size = 30; textWidth(title) > cardWidth || size < 1; size--) textSize(size);
+    for (let size = 30; textWidth(title) > cardWidth || size < 1; size--) {
+        textSize(size);
+    }
     text(title, 0, 0, cardWidth, titleHeight);
-    getImageFromURL(imgURL, (base64) => {
-        loadImage(base64, (img) => {
+
+    getImageFromURL(image, (base64) => {
+        loadImage(base64, (thumbnail) => {
             let w = cardWidth;
-            let h = img.height * cardWidth / img.width;
+            let h = thumbnail.height * cardWidth / thumbnail.width;
             if (h > imageHeight) {
-                w = img.width * imageHeight / img.height;
+                w = thumbnail.width * imageHeight / thumbnail.height;
                 h = imageHeight;
             }
-            image(img, cardWidth * 0.5, titleHeight + imageHeight * 0.5, w, h);
+            image(thumbnail, cardWidth * 0.5, titleHeight + imageHeight * 0.5, w, h);
             callback(p5canvas.canvas.toDataURL("image/png"));
         });
     });
