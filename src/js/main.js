@@ -82,9 +82,7 @@ function init() {
     imageMode(CENTER);
 
     // add card
-    addCard({
-        title: 'progfay'
-    });
+    getPageData('progfay-pub', 'progfay', (pageData) => { addCard(pageData) })
 
     // add lights
     let light = new THREE.AmbientLight(0xffffff);
@@ -146,7 +144,7 @@ function addCard(payload, callback) {
 
     let links = Array.from(set);
     let title = payload.title;
-    let image = payload.image;
+    let imageURL = payload.image;
 
     background('#EEEEFF');
 
@@ -156,7 +154,7 @@ function addCard(payload, callback) {
     }
     text(title, 0, 0, cardWidth, titleHeight);
 
-    getImageFromURL(image, (base64) => {
+    getImageFromURL(imageURL, (base64) => {
         loadImage(base64, (thumbnail) => {
             let w = cardWidth;
             let h = thumbnail.height * cardWidth / thumbnail.width;
@@ -164,6 +162,7 @@ function addCard(payload, callback) {
                 w = thumbnail.width * imageHeight / thumbnail.height;
                 h = imageHeight;
             }
+
             image(thumbnail, cardWidth * 0.5, titleHeight + imageHeight * 0.5, w, h);
 
             let card = new THREE.Mesh(
