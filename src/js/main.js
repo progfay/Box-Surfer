@@ -2,10 +2,10 @@ let vrDisplay, vrFrameData, vrControls, arView;
 let ARcanvas, camera, scene, renderer;
 
 let pages = [];
-
 const cardWidth = 200;
 const titleHeight = 50;
 const imageHeight = 150;
+const projectName = 'progfay-pub';
 
 /**
  * Use the `getARDisplay()` utility to leverage the WebVR API
@@ -71,7 +71,6 @@ function init() {
     window.addEventListener('resize', onWindowResize, false);
 
     // add cards
-    let projectName = 'progfay-pub';
     getProjectData(projectName, (projectData) => {
         let pages = projectData.pages;
         for (let i = 0; i < pages.length; i++) {
