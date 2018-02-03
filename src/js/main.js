@@ -72,8 +72,8 @@ function init() {
     textAlign(CENTER, CENTER);
     imageMode(CENTER);
     // add card
-    createCardImage('progfay', 'https://i.gyazo.com/4ac7810705ef9c50a56d04f41a39b065.png', (cardImage) => {
-        let cardMesh = addCard(cardImage);
+    addCard({
+        title: 'progfay'
     });
     // add lights
     let light = new THREE.AmbientLight(0xffffff);
@@ -120,11 +120,10 @@ function onWindowResize() {
 
 
 /**
- * タイトルと画像の描画されたカードの画像を生成します。
+ * タイトルと画像の描画されたカードカードのMeshを生成し、@code{scene}と@code{pages}に追加します。
  * @param {JSON Object} payload ページのJSONデータ
- * @param {function} callback カードの画像 (Base64形式) を引数としたコールバック関数
  */
-function createCardImage(payload, callback) {
+function addCard(payload, callback) {
     let set = new Set(payload.links);
     let relatedPages = payload.relatedPages.links1hop;
     for (page in relatedPages) {
@@ -152,29 +151,19 @@ function createCardImage(payload, callback) {
                 h = imageHeight;
             }
             image(thumbnail, cardWidth * 0.5, titleHeight + imageHeight * 0.5, w, h);
-            callback(p5canvas.canvas.toDataURL("image/png"));
-        });
-    });
-}
 
-
-/**
- * カードの画像からカードのMeshを生成します。
- * @param {String} img カードの画像 (base64形式)
- * @return {Three.Mesh} カードのMesh
- */
-function addCard(image) {
-    loader.load(image,
-        (tex) => {
             let card = new THREE.Mesh(
                 new THREE.BoxGeometry(0.08, 0.08, 0.0005),
-                new THREE.MeshLambertMaterial({ map: tex })
+                new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(p5canvas.canvas) })
             );
             card.position.set(Math.random() - 0.5, camera.position.y - 0.25, Math.random() - 0.5);
             card.rotation.y = THREE.Math.degToRad(90);
-            // pages.push(card);
+
+            card.links = links;
+            pages[title] = card;
             scene.add(card);
         });
+    });
 }
 
 
