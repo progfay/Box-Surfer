@@ -3,7 +3,6 @@ let ARcanvas, camera, scene, renderer;
 
 let pages = [];
 
-let p5canvas;
 const cardWidth = 200;
 const titleHeight = 50;
 const imageHeight = 150;
@@ -71,19 +70,11 @@ function init() {
     // Bind our event handlers
     window.addEventListener('resize', onWindowResize, false);
 
-    // p5.js setup
-    p5canvas = createCanvas(cardWidth, titleHeight + imageHeight);
-    p5canvas.canvas.style.display = 'none';
-    p5canvas.canvas.style.borderRadius = '5px';
-    textAlign(CENTER, CENTER);
-    imageMode(CENTER);
-
-    // add card
+    // add cards
     let projectName = 'progfay-pub';
     getProjectData(projectName, (projectData) => {
         let pages = projectData.pages;
         for (let i = 0; i < pages.length; i++) {
-            openURL('https://scrapbox.io/' + projectName + '/' + pages[i].title);
             getPageData(projectName, pages[i].title, (pageData) => { addCard(pageData) });
         }
     });
@@ -150,36 +141,45 @@ function addCard(payload, callback) {
     let title = payload.title;
     let imageURL = payload.image;
 
-    background('#EEEEFF');
-
-    textSize(30);
-    for (let size = 30; textWidth(title) > cardWidth || size < 1; size--) {
-        textSize(size);
-    }
-    text(title, 0, 0, cardWidth, titleHeight);
-
     getImageFromURL(imageURL, (base64) => {
-        loadImage(base64, (thumbnail) => {
-            let w = cardWidth;
-            let h = thumbnail.height * cardWidth / thumbnail.width;
-            if (h > imageHeight) {
-                w = thumbnail.width * imageHeight / thumbnail.height;
-                h = imageHeight;
+        new p5((p) => {
+            p.setup = () => {
+                loadImage(base64, (thumbnail) => {
+                    p.noLoop();
+                    let p5canvas = p.createCanvas(cardWidth, titleHeight + imageHeight);
+                    p5canvas.canvas.style.display = 'none';
+                    p.textAlign(CENTER, CENTER);
+                    p.imageMode(CENTER);
+
+                    p.background('#EEEEFF');
+
+                    let w = cardWidth;
+                    let h = thumbnail.height * cardWidth / thumbnail.width;
+                    if (h > imageHeight) {
+                        w = thumbnail.width * imageHeight / thumbnail.height;
+                        h = imageHeight;
+                    }
+                    p.image(thumbnail, cardWidth * 0.5, titleHeight + imageHeight * 0.5, w, h);
+
+                    p.textSize(30);
+                    for (let size = 30; p.textWidth(title) > cardWidth || size < 1; size--) {
+                        p.textSize(size);
+                    }
+                    p.text(title, 0, 0, cardWidth, titleHeight);
+
+                    let card = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.08, 0.08, 0.0005),
+                        new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(p5canvas.canvas) })
+                    );
+                    card.position.set(Math.random() - 0.5, camera.position.y - 0.25, Math.random() - 0.5);
+                    card.rotation.y = THREE.Math.degToRad(90);
+
+                    card.links = links;
+                    pages[title] = card;
+                    scene.add(card);
+                });
             }
-
-            image(thumbnail, cardWidth * 0.5, titleHeight + imageHeight * 0.5, w, h);
-
-            let card = new THREE.Mesh(
-                new THREE.BoxGeometry(0.08, 0.08, 0.0005),
-                new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(p5canvas.canvas) })
-            );
-            card.position.set(Math.random() - 0.5, camera.position.y - 0.25, Math.random() - 0.5);
-            card.rotation.y = THREE.Math.degToRad(90);
-
-            card.links = links;
-            pages[title] = card;
-            scene.add(card);
-        });
+        }, null);
     });
 }
 
