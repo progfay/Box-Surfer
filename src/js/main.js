@@ -9,7 +9,7 @@ const cardWidth = 200;
 const titleHeight = 50;
 const imageHeight = 150;
 // between camera and card
-const DISTANCE = 1.2;
+const DISTANCE = 0.8;
 // project name that is displayed
 let projectName;
 
@@ -91,8 +91,15 @@ function init() {
     // add cards
     getProjectData(projectName, (projectData) => {
         let pages = projectData.pages;
-        for (let i = 0; i < pages.length; i++) {
-            getPageData(projectName, pages[i].title, (pageData) => { addCard(pageData) });
+        let pageNum = pages.length;
+        let posY = camera.position.y;
+        let unitRad = THREE.Math.degToRad(360 / pageNum);
+
+        for (let i = 0; i < pageNum; i++) {
+            let theta = unitRad * i;
+            getPageData(projectName, pages[i].title, (pageData) => {
+                addCard(pageData, posY, theta);
+            });
         }
     });
 
@@ -172,7 +179,7 @@ function onTouchStart(event) {
  * タイトルと画像の描画されたカードカードのMeshを生成し、@code{scene}と@code{pages}に追加します。
  * @param {JSON Object} payload ページのJSONデータ
  */
-function addCard(payload) {
+function addCard(payload, posY, theta) {
     let set = new Set(payload.links);
     for (page in payload.relatedPages.links1hop) {
         set.add(page.title);
@@ -212,8 +219,8 @@ function addCard(payload) {
                         new THREE.BoxGeometry(0.08, 0.08, 0.0005),
                         new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(p5canvas.canvas) })
                     );
-                    card.position.set(Math.random() - 0.5, camera.position.y - 0.25, Math.random() - 0.5);
-                    card.rotation.y = THREE.Math.degToRad(90);
+                    card.position.set(Math.sin(theta) * DISTANCE, posY, Math.cos(theta) * DISTANCE);
+                    card.rotation.y = theta;
 
                     card.links = links;
                     card.title = title;

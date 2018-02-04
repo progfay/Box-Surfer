@@ -85,3 +85,4 @@ typings/
 .env
 
 src/.vscode/*
+.vscode
