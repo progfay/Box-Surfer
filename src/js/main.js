@@ -1,12 +1,19 @@
 let vrDisplay, vrFrameData, vrControls, arView;
 let ARcanvas, camera, scene, renderer;
 
+// page cards array
 let pages = [];
+// card image width (card image width resize to 0.08)
 const cardWidth = 200;
+// title and thumbnail Height (card image hiehgt resize to 0.08)
 const titleHeight = 50;
 const imageHeight = 150;
+// between camera and card
+const DISTANCE = 1.2;
+// project name that is displayed
 let projectName;
 
+// for collision judgement
 let raycaster, mouse;
 
 /**
