@@ -14,8 +14,6 @@ const imageHeight = 150;
 const DISTANCE = 0.8;
 // project name that is displayed
 let projectName;
-// base Y position
-let baseY;
 // 360 degree / page number in project
 let unitRad;
 // page number in project
@@ -127,16 +125,16 @@ function init() {
     // add cards
     getProjectData(projectName, (projectData) => {
         let pageList = projectData.pages;
+        let baseY = camera.position.y;
 
         pageNum = pageList.length;
         unitRad = 360 / pageNum;
         pages = new Array();
-        baseY = camera.position.y;
 
         for (let i = 0; i < pageNum; i++) {
             let theta = THREE.Math.degToRad(unitRad * i);
             getPageData(projectName, pageList[i].title, (pageData) => {
-                addCard(pageData, theta);
+                addCard(pageData, baseY, theta);
             });
         }
     });
@@ -226,9 +224,10 @@ function onTap(event) {}
 /**
  * タイトルと画像の描画されたカードカードのMeshを生成し、@code{scene}と@code{pages}に追加します。
  * @param {JSON Object} payload ページのJSONデータ
+ * @param {Number} baseY カード生成地点のYのベース座標
  * @param {Number} theta XZ平面に置けるカード生成地点の偏角
  */
-function addCard(payload, theta) {
+function addCard(payload, baseY, theta) {
     let set = new Set(payload.links);
     for (page in payload.relatedPages.links1hop) {
         set.add(page.title);
@@ -270,7 +269,11 @@ function addCard(payload, theta) {
                     );
                     card.links = links;
                     card.title = title;
-                    card.position.set(Math.sin(theta) * DISTANCE, baseY, Math.cos(theta) * DISTANCE);
+                    card.position.set(
+                        Math.sin(theta) * DISTANCE,
+                        baseY + (Math.random() - 0.5) * DISTANCE * 0.1,
+                        Math.cos(theta) * DISTANCE
+                    );
                     card.rotation.y = theta;
 
                     pages.push(card);
