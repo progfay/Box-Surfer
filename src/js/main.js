@@ -219,7 +219,20 @@ function collisionCard(event, callback) {
 /**
  * On tap window, open card link in servered PC.
  */
-function onTap(event) {}
+function onTap(card) {
+    let selected = card.title;
+    let linkPages = links[selected];
+
+    for (let i = 0; i < pageNum; i++) {
+        let title = pages[i].title;
+        if (title == selected) continue;
+        if (linkPages.includes(title)) {
+            // process when this page is in links
+        } else {
+            // process when this page isn't in links
+        }
+    }
+}
 
 
 /**
