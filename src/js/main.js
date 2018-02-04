@@ -107,7 +107,8 @@ function init() {
         for (let i = 0; i < pageNum; i++) {
             let theta = pages[i].rotation.y + 0.03;
 
-            pages[i].position.set(Math.sin(theta) * DISTANCE, baseY, Math.cos(theta) * DISTANCE);
+            pages[i].position.x = Math.sin(theta) * DISTANCE;
+            pages[i].position.z = Math.cos(theta) * DISTANCE;
             pages[i].rotation.set(0, theta, 0);
         }
     });
@@ -117,7 +118,8 @@ function init() {
         for (let i = 0; i < pageNum; i++) {
             let theta = pages[i].rotation.y - 0.03;
 
-            pages[i].position.set(Math.sin(theta) * DISTANCE, baseY, Math.cos(theta) * DISTANCE);
+            pages[i].position.x = Math.sin(theta) * DISTANCE;
+            pages[i].position.z = Math.cos(theta) * DISTANCE;
             pages[i].rotation.set(0, theta, 0);
         }
     });
