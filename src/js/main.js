@@ -4,7 +4,7 @@ let ARcanvas, camera, scene, renderer;
 let hammer;
 
 // page cards array
-let pages = [];
+let pages;
 // card image width (card image width resize to 0.08)
 const cardWidth = 200;
 // title and thumbnail Height (card image hiehgt resize to 0.08)
@@ -14,8 +14,12 @@ const imageHeight = 150;
 const DISTANCE = 0.8;
 // project name that is displayed
 let projectName;
-// On pan left/right, keep rotation radians
-let offset_rotation = 0;
+// base Y position
+let baseY;
+// 360 degree / page number in project
+let unitRad;
+// page number in project
+let pageNum;
 
 // for collision judgement
 let raycaster, mouse;
@@ -92,43 +96,45 @@ function init() {
     window.addEventListener('resize', onWindowResize, false);
 
     // setup for hammer.js and gesture controls
-    hammer = new Hammer(canvas);
+    hammer = new Hammer(ARcanvas);
     hammer.on("tap", (e) => collisionCard(e, onTap));
     hammer.on("doubletap", (e) => collisionCard(e, (card) => {
         openURL('https://scrapbox.io/' + projectName + '/' + card.title);
     }));
     hammer.on("panleft", (e) => {
-        let pageNum = pages.length;
-        let unitRad = THREE.Math.degToRad(360 / pageNum);
-        offset_rotation -= 0.05;
+        if (!pages) return;
+
         for (let i = 0; i < pageNum; i++) {
-            let theta = unitRad * i + offset_rotation;
-            pages[i].position.x = Math.cos(theta);
-            pages[i].position.z = Math.sin(theta);
+            let theta = pages[i].rotation.y + 0.03;
+
+            pages[i].position.set(Math.sin(theta) * DISTANCE, baseY, Math.cos(theta) * DISTANCE);
+            pages[i].rotation.set(0, theta, 0);
         }
     });
     hammer.on("panright", (e) => {
-        let pageNum = pages.length;
-        let unitRad = THREE.Math.degToRad(360 / pageNum);
-        offset_rotation += 0.05;
+        if (!pages) return;
+
         for (let i = 0; i < pageNum; i++) {
-            let theta = unitRad * i + offset_rotation;
-            pages[i].position.x = Math.cos(theta);
-            pages[i].position.z = Math.sin(theta);
+            let theta = pages[i].rotation.y - 0.03;
+
+            pages[i].position.set(Math.sin(theta) * DISTANCE, baseY, Math.cos(theta) * DISTANCE);
+            pages[i].rotation.set(0, theta, 0);
         }
     });
 
     // add cards
     getProjectData(projectName, (projectData) => {
-        let pages = projectData.pages;
-        let pageNum = pages.length;
-        let posY = camera.position.y;
-        let unitRad = THREE.Math.degToRad(360 / pageNum);
+        let pageList = projectData.pages;
+
+        pageNum = pageList.length;
+        unitRad = 360 / pageNum;
+        pages = new Array();
+        baseY = camera.position.y;
 
         for (let i = 0; i < pageNum; i++) {
-            let theta = unitRad * i + offset_rotation;
-            getPageData(projectName, pages[i].title, (pageData) => {
-                addCard(pageData, posY, theta);
+            let theta = THREE.Math.degToRad(unitRad * i);
+            getPageData(projectName, pageList[i].title, (pageData) => {
+                addCard(pageData, theta);
             });
         }
     });
@@ -189,6 +195,8 @@ function onWindowResize() {
  * @param callback {function} callback function with touched card Mesh argument
  */
 function collisionCard(event, callback) {
+    if (!pages) return;
+
     // stopping event propagation
     event.preventDefault();
 
@@ -216,8 +224,9 @@ function onTap(event) {}
 /**
  * タイトルと画像の描画されたカードカードのMeshを生成し、@code{scene}と@code{pages}に追加します。
  * @param {JSON Object} payload ページのJSONデータ
+ * @param {Number} theta XZ平面に置けるカード生成地点の偏角
  */
-function addCard(payload, posY, theta) {
+function addCard(payload, theta) {
     let set = new Set(payload.links);
     for (page in payload.relatedPages.links1hop) {
         set.add(page.title);
@@ -257,11 +266,11 @@ function addCard(payload, posY, theta) {
                         new THREE.BoxGeometry(0.08, 0.08, 0.0005),
                         new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(p5canvas.canvas) })
                     );
-                    card.position.set(Math.sin(theta) * DISTANCE, posY, Math.cos(theta) * DISTANCE);
-                    card.rotation.y = theta;
-
                     card.links = links;
                     card.title = title;
+                    card.position.set(Math.sin(theta) * DISTANCE, baseY, Math.cos(theta) * DISTANCE);
+                    card.rotation.y = theta;
+
                     pages.push(card);
                     scene.add(card);
                 });
@@ -292,10 +301,7 @@ function getProjectData(projectName, callback) {
 function getPageData(projectName, pageName, callback) {
     let xhr = new XMLHttpRequest();
     xhr.open('GET', '/pageData?project=' + encodeURIComponent(projectName) + '&page=' + encodeURIComponent(pageName));
-    xhr.onload = (e) => {
-        openURL('https://scrapbox.io/' + pageName + '-' + xhr.responseText.substring(0, 30));
-        callback(JSON.parse(xhr.responseText))
-    };
+    xhr.onload = (e) => { callback(JSON.parse(xhr.responseText)) };
     xhr.send(null);
 }
 
