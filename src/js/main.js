@@ -5,6 +5,8 @@ let hammer;
 
 // page cards array
 let pages;
+// page's links dictionary
+let links = {};
 // card image width (card image width resize to 0.08)
 const cardWidth = 200;
 // title and thumbnail Height (card image hiehgt resize to 0.08)
@@ -227,14 +229,14 @@ function onTap(event) {}
  * @param {Number} theta XZ平面に置けるカード生成地点の偏角
  */
 function addCard(payload, baseY, theta) {
+    let title = payload.title;
+    let imageURL = payload.image;
+
     let set = new Set(payload.links);
     for (page in payload.relatedPages.links1hop) {
         set.add(page.title);
     }
-
-    let links = Array.from(set);
-    let title = payload.title;
-    let imageURL = payload.image;
+    links[title] = Array.from(set);
 
     getImageFromURL(imageURL, (base64) => {
         new p5((p) => {
@@ -266,7 +268,6 @@ function addCard(payload, baseY, theta) {
                         new THREE.BoxGeometry(0.08, 0.08, 0.0005),
                         new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(p5canvas.canvas) })
                     );
-                    card.links = links;
                     card.title = title;
                     card.position.set(
                         Math.sin(theta) * DISTANCE,
