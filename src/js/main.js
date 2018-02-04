@@ -11,14 +11,13 @@ const cardWidth = 200;
 const titleHeight = 50;
 const imageHeight = 150;
 // between camera and card
-const DISTANCE = 0.8;
+const DISTANCE = 0.6;
 // project name that is displayed
 let projectName;
 // 360 degree / page number in project
 let unitRad;
 // page number in project
 let pageNum;
-
 // for collision judgement
 let raycaster, mouse;
 
