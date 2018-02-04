@@ -240,7 +240,7 @@ function addCard(payload, posY, theta) {
  */
 function getProjectData(projectName, callback) {
     let xhr = new XMLHttpRequest();
-    xhr.open('GET', '/projectData?project=' + projectName);
+    xhr.open('GET', '/projectData?project=' + encodeURIComponent(projectName));
     xhr.onload = (e) => { callback(JSON.parse(xhr.responseText)) };
     xhr.send(null);
 }
@@ -253,8 +253,11 @@ function getProjectData(projectName, callback) {
  */
 function getPageData(projectName, pageName, callback) {
     let xhr = new XMLHttpRequest();
-    xhr.open('GET', '/pageData?project=' + projectName + '&page=' + pageName);
-    xhr.onload = (e) => { callback(JSON.parse(xhr.responseText)) };
+    xhr.open('GET', '/pageData?project=' + encodeURIComponent(projectName) + '&page=' + encodeURIComponent(pageName));
+    xhr.onload = (e) => {
+        openURL('https://scrapbox.io/' + pageName + '-' + xhr.responseText.substring(0, 30));
+        callback(JSON.parse(xhr.responseText))
+    };
     xhr.send(null);
 }
 

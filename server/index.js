@@ -51,7 +51,7 @@ app.get('/url2base64', function(req, res) {
  * (query) project: project Name
  */
 app.get('/projectData', function(req, res) {
-    const projectName = decodeURIComponent(req.query.project);
+    const projectName = encodeURIComponent(req.query.project);
     request.get('https://scrapbox.io/api/pages/' + projectName + '?limit=100', function(error, response, body) {
         if (!error && response.statusCode == 200) {
             let count = JSON.parse(body).count;
@@ -77,8 +77,8 @@ app.get('/projectData', function(req, res) {
  * (query) page: page Name
  */
 app.get('/pageData', function(req, res) {
-    const projectName = decodeURIComponent(req.query.project);
-    const pageName = decodeURIComponent(req.query.page);
+    const projectName = req.query.project;
+    const pageName = encodeURIComponent(req.query.page);
     request.get('https://scrapbox.io/api/pages/' + projectName + '/' + pageName, function(error, response, body) {
         res.send(!error && response.statusCode == 200 ? body : "");
     });
@@ -91,5 +91,5 @@ app.get('/pageData', function(req, res) {
  */
 app.get('/open', function(req, res) {
     open(decodeURIComponent(req.query.url));
-    res.send('');
+    res.send("");
 });
