@@ -165,7 +165,7 @@ function onTouchStart(event) {
  * タイトルと画像の描画されたカードカードのMeshを生成し、@code{scene}と@code{pages}に追加します。
  * @param {JSON Object} payload ページのJSONデータ
  */
-function addCard(payload, callback) {
+function addCard(payload) {
     let set = new Set(payload.links);
     for (page in payload.relatedPages.links1hop) {
         set.add(page.title);
