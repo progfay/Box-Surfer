@@ -1,6 +1,8 @@
 let vrDisplay, vrFrameData, vrControls, arView;
 let ARcanvas, camera, scene, renderer;
 
+let hammer;
+
 // page cards array
 let pages = [];
 // card image width (card image width resize to 0.08)
@@ -12,6 +14,8 @@ const imageHeight = 150;
 const DISTANCE = 0.8;
 // project name that is displayed
 let projectName;
+// On pan left/right, keep rotation radians
+let offset_rotation = 0;
 
 // for collision judgement
 let raycaster, mouse;
@@ -86,7 +90,33 @@ function init() {
 
     // Bind our event handlers
     window.addEventListener('resize', onWindowResize, false);
-    window.addEventListener('touchstart', onTouchStart, false);
+
+    // setup for hammer.js and gesture controls
+    hammer = new Hammer(canvas);
+    hammer.on("tap", (e) => collisionCard(e, onTap));
+    hammer.on("doubletap", (e) => collisionCard(e, (card) => {
+        openURL('https://scrapbox.io/' + projectName + '/' + card.title);
+    }));
+    hammer.on("panleft", (e) => {
+        let pageNum = pages.length;
+        let unitRad = THREE.Math.degToRad(360 / pageNum);
+        offset_rotation -= 0.05;
+        for (let i = 0; i < pageNum; i++) {
+            let theta = unitRad * i + offset_rotation;
+            pages[i].position.x = Math.cos(theta);
+            pages[i].position.z = Math.sin(theta);
+        }
+    });
+    hammer.on("panright", (e) => {
+        let pageNum = pages.length;
+        let unitRad = THREE.Math.degToRad(360 / pageNum);
+        offset_rotation += 0.05;
+        for (let i = 0; i < pageNum; i++) {
+            let theta = unitRad * i + offset_rotation;
+            pages[i].position.x = Math.cos(theta);
+            pages[i].position.z = Math.sin(theta);
+        }
+    });
 
     // add cards
     getProjectData(projectName, (projectData) => {
@@ -96,7 +126,7 @@ function init() {
         let unitRad = THREE.Math.degToRad(360 / pageNum);
 
         for (let i = 0; i < pageNum; i++) {
-            let theta = unitRad * i;
+            let theta = unitRad * i + offset_rotation;
             getPageData(projectName, pages[i].title, (pageData) => {
                 addCard(pageData, posY, theta);
             });
@@ -150,29 +180,37 @@ function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
+
 /**
- * On window touch, open card link in servered PC.
+ * On event, user's finger is touched at card Mesh or not.
+ * When is touch, callback function execute with touched card Mesh argument.
+ * Otherwise, do nothing.
+ * @param event {Event} gesture event
+ * @param callback {function} callback function with touched card Mesh argument
  */
-function onTouchStart(event) {
+function collisionCard(event, callback) {
     // stopping event propagation
     event.preventDefault();
 
     // get touched position in window
-    let touchObject = event.changedTouches[0];
+    let center = event.center;
 
     // get touch position
-    mouse.x = (touchObject.pageX / window.innerWidth) * 2 - 1;
-    mouse.y = -(touchObject.pageY / window.innerHeight) * 2 + 1;
+    mouse.x = (center.x / window.innerWidth) * 2 - 1;
+    mouse.y = -(center.y / window.innerHeight) * 2 + 1;
 
     // get object that cross ray
     raycaster.setFromCamera(mouse, camera);
     var intersects = raycaster.intersectObjects(pages);
 
-    // open touched card link in servered PC
-    if (intersects.length > 0) {
-        openURL('https://scrapbox.io/' + projectName + '/' + intersects[0].object.title);
-    }
+    // if collision mesh found, execute callback function
+    if (intersects.length > 0) callback(intersects[0].object);
 }
+
+/**
+ * On tap window, open card link in servered PC.
+ */
+function onTap(event) {}
 
 
 /**
