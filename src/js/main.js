@@ -103,12 +103,28 @@ function init() {
 
     // setup for hammer.js and gesture controls
     hammer = new Hammer(ARcanvas);
-    hammer.on("tap", (e) => collisionCard(e, onTap));
-    hammer.on("doubletap", (e) => collisionCard(e, (card) => { openURL('https://scrapbox.io/' + projectName + '/' + card.title) }));
-    hammer.on("panleft", (e) => { rotateMeshed(-0.03) });
-    hammer.on("panright", (e) => { rotateMeshed(0.03) });
-    hammer.on("panup", (e) => { rotateMeshed(-0.03) });
-    hammer.on("pandown", (e) => { rotateMeshed(0.03) });
+    hammer.on("tap", (e) => {
+        collisionCard(e, (card) => {
+            onTap(card);
+        });
+    });
+    hammer.on("doubletap", (e) => {
+        collisionCard(e, (card) => {
+            openURL('https://scrapbox.io/' + projectName + '/' + card.title);
+        })
+    });
+    hammer.on("panleft", (e) => {
+        rotateCardsY(-0.03);
+    });
+    hammer.on("panright", (e) => {
+        rotateCardsY(0.03);
+    });
+    hammer.on("panup", (e) => {
+        rotateCardsY(-0.03);
+    });
+    hammer.on("pandown", (e) => {
+        rotateCardsY(0.03);
+    });
 
     // add cards
     getProjectData(projectName, (projectData) => {
