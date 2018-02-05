@@ -164,6 +164,7 @@ function init() {
 function update() {
     // card Mesh and line Mesh animation
     if (animationCount != 0) {
+
         for (let i = 0; i < pageNum; i++) {
             let page = pages[i];
             page.position.add(page.velocity);
@@ -191,8 +192,6 @@ function update() {
 
             lines = _lines;
         }
-
-
 
         animationCount--;
     }
@@ -334,6 +333,7 @@ function onTap(card) {
             scene.add(line);
 
             linkCount++;
+
         } else {
             // process when this page isn't in links
             let _deg = offsetRad + unitOtherRad * otherCount;
@@ -353,7 +353,9 @@ function onTap(card) {
 
             otherCount++;
         }
+
     }
+
     animationCount += ANIMATION_FRAME;
 }
 
@@ -373,6 +375,7 @@ function addCard(payload, baseY, theta) {
         .map((v) => { return v.toLowerCase() })
         .filter((v) => { return v != lowTitle });
     let linkTitles = Object.keys(links);
+
     for (let i = 0; i < linkTitles.length; i++) {
         let linkTitle = linkTitles[i];
         let inThisPages = linkPages.includes(linkTitle);
@@ -383,8 +386,11 @@ function addCard(payload, baseY, theta) {
     links[lowTitle] = linkPages;
 
     getImageFromURL(imageURL, (base64) => {
+
         new p5((p) => {
+
             p.setup = () => {
+
                 loadImage(base64, (thumbnail) => {
                     p.noLoop();
                     let p5canvas = p.createCanvas(cardWidth, titleHeight + imageHeight);
@@ -412,6 +418,7 @@ function addCard(payload, baseY, theta) {
                         new THREE.BoxGeometry(0.08, 0.08, 0.0005),
                         new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(p5canvas.canvas) })
                     );
+
                     card.title = lowTitle;
                     card.position.set(Math.sin(theta) * DISTANCE, baseY, Math.cos(theta) * DISTANCE);
                     card.rotation.y = theta;
@@ -420,9 +427,13 @@ function addCard(payload, baseY, theta) {
                     pages.push(card);
                     scene.add(card);
                 });
+
             }
+
         }, null);
+
     });
+
 }
 
 /**
@@ -433,6 +444,7 @@ function rotateCardsY(rad) {
     if (!pages) return;
     let _sin = Math.sin(rad);
     let _cos = Math.cos(rad);
+
     for (let i = 0; i < pageNum; i++) {
         let page = pages[i];
         let _pos = page.position.clone();
