@@ -4,6 +4,11 @@ let hammer;
 
 // page cards array
 let pages;
+// line Mesh between linked page
+let lines = [];
+// line geometry and texture base
+let lineMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff });
+let lineGeometry = new THREE.Geometry();
 // page's links dictionary
 let links = {};
 // card image width (card image width resize to 0.08)
@@ -226,10 +231,13 @@ function collisionCard(event, callback) {
 function onTap(card) {
     let selected = card.title;
     let linkPages = links[selected];
-    openURL('https://scrapbox.io/hoge.html?' + linkPages.join(';'));
-    if (linkPages.length == 0) return;
 
-    //  ======================= //
+    for (let i = 0; i < lines.length; i++) {
+        scene.remove(lines[i]);
+    }
+    lines = [];
+
+    if (linkPages.length == 0) return;
 
     let selectedPos = card.position.clone();
     let selectedRot = card.rotation.clone();
@@ -242,8 +250,6 @@ function onTap(card) {
     let offsetRad = previewRad * 0.5;
     let otherCount = 0;
 
-    //  ======================= //
-
     for (let i = 0; i < pageNum; i++) {
         let page = pages[i];
         let title = pages[i].title;
@@ -251,7 +257,6 @@ function onTap(card) {
         if (title == selected) continue;
 
         if (linkPages.includes(title)) {
-            openURL('https://scrapbox.io/title.html?' + title);
             // process when this page is in links
             let _pos = selectedPos.clone();
             _pos.y += rs;
@@ -274,6 +279,12 @@ function onTap(card) {
                 _pos.x * (axis.z * axis.x * (1 - _cos) - axis.y * _sin) +
                 _pos.y * (axis.z * axis.y * (1 - _cos) + axis.x * _sin) +
                 _pos.z * (axis.z * axis.z * (1 - _cos) + _cos);
+
+            let lineGeo = lineGeometry.clone();
+            lineGeo.vertices.push(selectedPos.clone(), page.position.clone());
+            let line = new THREE.Line(lineGeo, lineMaterial);
+            lines.push(line);
+            scene.add(line);
 
             page.rotation.y = selectedRot.y;
             linkCount++;
@@ -377,4 +388,32 @@ function rotateCardsY(rad) {
         page.position.z = _pos.x * _sin + _pos.z * _cos;
         page.rotation.y -= rad;
     }
+
+    if (lines.length == 0) return;
+
+    for (let i = 0; i < lines.length; i++) {
+        scene.remove(lines[i]);
+    }
+
+    let _lines = [];
+
+    for (let i = 0; i < lines.length; i++) {
+        let verts = lines[i].geometry.vertices;
+
+        let start = verts[0].clone();
+        verts[0].x = start.x * _cos - start.z * _sin;
+        verts[0].z = start.x * _sin + start.z * _cos;
+
+        let end = verts[1].clone();
+        verts[1].x = end.x * _cos - end.z * _sin;
+        verts[1].z = end.x * _sin + end.z * _cos;
+
+        let lineGeo = lineGeometry.clone();
+        lineGeo.vertices.push(verts[0], verts[1]);
+        let _line = new THREE.Line(lineGeo, lineMaterial);
+        _lines.push(_line);
+        scene.add(_line);
+    }
+
+    lines = _lines;
 }
