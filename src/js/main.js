@@ -281,8 +281,8 @@ function addCard(payload, baseY, theta) {
 
     let lowTitle = title.toLowerCase();
     let linkPages = payload.links
-        .filter((v) => { return v != lowTitle })
-        .map((v) => { return v.toLowerCase() });
+        .map((v) => { return v.toLowerCase() })
+        .filter((v) => { return v != lowTitle });
     let linkTitles = Object.keys(links);
     for (let i = 0; i < linkTitles.length; i++) {
         let linkTitle = linkTitles[i];
