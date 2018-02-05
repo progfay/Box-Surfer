@@ -286,8 +286,8 @@ function onTap(card) {
     let unitLinkRad = THREE.Math.degToRad(360) / (linkPages.length);
     let linkCount = 0;
 
-    let unitOtherRad = (THREE.Math.degToRad(360) - previewRad) / (pageNum - linkPages.length - 2);
-    let offsetRad = previewRad * 0.5;
+    let unitOtherRad = (THREE.Math.degToRad(360) - previewRad) / (pageNum - linkPages.length);
+    let offsetRad = previewRad * 0.5 + unitOtherRad;
     let otherCount = 0;
 
     for (let i = 0; i < pageNum; i++) {
