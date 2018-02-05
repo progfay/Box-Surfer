@@ -412,7 +412,7 @@ function addCard(payload, baseY, theta) {
                     for (let size = 30; p.textWidth(title) > cardWidth || size < 1; size--) {
                         p.textSize(size);
                     }
-                    p.text(title, 0, 0, cardWidth, titleHeight);
+                    p.text(title, cardWidth * 0.5, titleHeight * 0.5);
 
                     let card = new THREE.Mesh(
                         new THREE.BoxGeometry(0.08, 0.08, 0.0005),
