@@ -267,8 +267,11 @@ function onTap(card) {
             let _sin = Math.sin(_deg);
             let _cos = Math.cos(_deg);
 
-            page.position.x = selectedPos.x * _cos - selectedPos.z * _sin;
-            page.position.z = selectedPos.x * _sin + selectedPos.z * _cos;
+            page.position.set(
+                selectedPos.x * _cos - selectedPos.z * _sin,
+                selectedPos.y,
+                selectedPos.x * _sin + selectedPos.z * _cos
+            );
             page.rotation.y = selectedRot.y - _deg;
 
             otherCount++;
