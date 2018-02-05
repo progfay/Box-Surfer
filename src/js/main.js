@@ -13,6 +13,13 @@ const titleHeight = 50;
 const imageHeight = 150;
 // between camera and card
 const DISTANCE = 0.6;
+// radians of set place that selected card's links preview
+const previewRad = THREE.Math.degToRad(50);
+// statement for links preview
+const rs = DISTANCE * Math.sin(previewRad * 0.5);
+const rc = DISTANCE * Math.cos(previewRad * 0.5);
+// nomal vector on Y axis
+const AXIS_Y = new THREE.Vector3(0, 1, 0).normalize();
 // project name that is displayed
 let projectName;
 // 360 degree / page number in project
@@ -250,20 +257,75 @@ function collisionCard(event, callback) {
     if (intersects.length > 0) callback(intersects[0].object);
 }
 
+
 /**
  * On tap window, open card link in servered PC.
  */
 function onTap(card) {
     let selected = card.title;
     let linkPages = links[selected];
+    openURL('https://scrapbox.io/hoge.html?' + linkPages.join(';'));
+    if (linkPages.length == 0) return;
+
+    //  ======================= //
+
+    let selectedPos = card.position.clone();
+    let selectedRot = card.rotation.clone();
+
+    let axis = selectedPos.clone().normalize();
+    let unitLinkRad = THREE.Math.degToRad(360) / (linkPages.length);
+    let linkCount = 0;
+
+    let unitOtherRad = (THREE.Math.degToRad(360) - previewRad) / (pageNum - linkPages.length - 2);
+    let offsetRad = previewRad * 0.5;
+    let otherCount = 0;
+
+    //  ======================= //
 
     for (let i = 0; i < pageNum; i++) {
+        let page = pages[i];
         let title = pages[i].title;
+
         if (title == selected) continue;
+
         if (linkPages.includes(title)) {
+            openURL('https://scrapbox.io/title.html?' + title);
             // process when this page is in links
+            let _pos = selectedPos.clone();
+            _pos.y += rs;
+
+            let _deg = unitLinkRad * linkCount;
+            let _sin = Math.sin(_deg);
+            let _cos = Math.cos(_deg);
+
+            page.position.x = 0 +
+                _pos.x * (axis.x * axis.x * (1 - _cos) + _cos) +
+                _pos.y * (axis.x * axis.y * (1 - _cos) - axis.z * _sin) +
+                _pos.z * (axis.x * axis.z * (1 - _cos) + axis.y * _sin);
+
+            page.position.y = 0 +
+                _pos.x * (axis.y * axis.x * (1 - _cos) + axis.z * _sin) +
+                _pos.y * (axis.y * axis.y * (1 - _cos) + _cos) +
+                _pos.z * (axis.y * axis.z * (1 - _cos) - axis.x * _sin);
+
+            page.position.z = 0 +
+                _pos.x * (axis.z * axis.x * (1 - _cos) - axis.y * _sin) +
+                _pos.y * (axis.z * axis.y * (1 - _cos) + axis.x * _sin) +
+                _pos.z * (axis.z * axis.z * (1 - _cos) + _cos);
+
+            page.rotation.y = selectedRot.y;
+            linkCount++;
         } else {
             // process when this page isn't in links
+            let _deg = offsetRad + unitOtherRad * otherCount;
+            let _sin = Math.sin(_deg);
+            let _cos = Math.cos(_deg);
+
+            page.position.x = selectedPos.x * _cos - selectedPos.z * _sin;
+            page.position.z = selectedPos.x * _sin + selectedPos.z * _cos;
+            page.rotation.y = selectedRot.y - _deg;
+
+            otherCount++;
         }
     }
 }
