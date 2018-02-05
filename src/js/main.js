@@ -103,57 +103,57 @@ function init() {
     hammer.on("panleft", (e) => {
         if (!pages) return;
 
-        let _deg = 0.03;
+        let _deg = -0.03;
         let _sin = Math.sin(_deg);
         let _cos = Math.cos(_deg);
         for (let i = 0; i < pageNum; i++) {
-            let page = page[i];
+            let page = pages[i];
             let _pos = page.position.clone();
             page.position.x = _pos.x * _cos - _pos.z * _sin;
             page.position.z = _pos.x * _sin + _pos.z * _cos;
-            page.rotation.y += _deg;
+            page.rotation.y -= _deg;
         }
     });
     hammer.on("panright", (e) => {
         if (!pages) return;
 
+        let _deg = 0.03;
+        let _sin = Math.sin(_deg);
+        let _cos = Math.cos(_deg);
+        for (let i = 0; i < pageNum; i++) {
+            let page = pages[i];
+            let _pos = page.position.clone();
+            page.position.x = _pos.x * _cos - _pos.z * _sin;
+            page.position.z = _pos.x * _sin + _pos.z * _cos;
+            page.rotation.y -= _deg;
+        }
+    });
+    hammer.on("panup", (e) => {
+        if (!pages) return;
+
         let _deg = -0.03;
         let _sin = Math.sin(_deg);
         let _cos = Math.cos(_deg);
         for (let i = 0; i < pageNum; i++) {
-            let page = page[i];
+            let page = pages[i];
             let _pos = page.position.clone();
             page.position.x = _pos.x * _cos - _pos.z * _sin;
             page.position.z = _pos.x * _sin + _pos.z * _cos;
-            page.rotation.y += _deg;
+            page.rotation.y -= _deg;
         }
     });
-    hammer.on("panup", (e) => {
+    hammer.on("pandown", (e) => {
         if (!pages) return;
 
         let _deg = 0.03;
         let _sin = Math.sin(_deg);
         let _cos = Math.cos(_deg);
         for (let i = 0; i < pageNum; i++) {
-            let page = page[i];
+            let page = pages[i];
             let _pos = page.position.clone();
             page.position.x = _pos.x * _cos - _pos.z * _sin;
             page.position.z = _pos.x * _sin + _pos.z * _cos;
-            page.rotation.y += _deg;
-        }
-    });
-    hammer.on("pandown", (e) => {
-        if (!pages) return;
-
-        let _deg = -0.03;
-        let _sin = Math.sin(_deg);
-        let _cos = Math.cos(_deg);
-        for (let i = 0; i < pageNum; i++) {
-            let page = page[i];
-            let _pos = page.position.clone();
-            page.position.x = _pos.x * _cos - _pos.z * _sin;
-            page.position.z = _pos.x * _sin + _pos.z * _cos;
-            page.rotation.y += _deg;
+            page.rotation.y -= _deg;
         }
     });
 
