@@ -245,16 +245,19 @@ function addCard(payload, baseY, theta) {
     let title = payload.title;
     let imageURL = payload.image;
 
-    let linkPages = payload.links;
+    let lowTitle = title.toLowerCase();
+    let linkPages = payload.links
+        .filter((v) => { return v != lowTitle })
+        .map((v) => { return v.toLowerCase() });
     let linkTitles = Object.keys(links);
     for (let i = 0; i < linkTitles.length; i++) {
         let linkTitle = linkTitles[i];
-        if (links[linkTitle].includes(title)) {
-            links[linkTitle].push(title);
-            linkPages.push(linkTitle);
-        }
+        let inThisPages = linkPages.includes(linkTitle);
+        let inAnotherLink = links[linkTitle].includes(lowTitle);
+        if (!inThisPages && inAnotherLink) linkPages.push(linkTitle);
+        if (inThisPages && !inAnotherLink) links[linkTitle].push(lowTitle);
     }
-    links[title] = linkPages;
+    links[lowTitle] = linkPages;
 
     getImageFromURL(imageURL, (base64) => {
         new p5((p) => {
