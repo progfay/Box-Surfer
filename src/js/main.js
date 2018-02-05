@@ -245,11 +245,16 @@ function addCard(payload, baseY, theta) {
     let title = payload.title;
     let imageURL = payload.image;
 
-    let set = new Set(payload.links);
-    for (page in payload.relatedPages.links1hop) {
-        set.add(page.title);
+    let linkPages = payload.links;
+    let linkTitles = Object.keys(links);
+    for (let i = 0; i < linkTitles.length; i++) {
+        let linkTitle = linkTitles[i];
+        if (links[linkTitle].includes(title)) {
+            links[linkTitle].push(title);
+            linkPages.push(linkTitle);
+        }
     }
-    links[title] = Array.from(set);
+    links[title] = linkPages;
 
     getImageFromURL(imageURL, (base64) => {
         new p5((p) => {
