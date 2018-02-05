@@ -287,11 +287,7 @@ function addCard(payload, baseY, theta) {
                         new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(p5canvas.canvas) })
                     );
                     card.title = title;
-                    card.position.set(
-                        Math.sin(theta) * DISTANCE,
-                        baseY + (Math.random() - 0.5) * DISTANCE * 0.1,
-                        Math.cos(theta) * DISTANCE
-                    );
+                    card.position.set(Math.sin(theta) * DISTANCE, baseY, Math.cos(theta) * DISTANCE);
                     card.rotation.y = theta;
 
                     pages.push(card);
