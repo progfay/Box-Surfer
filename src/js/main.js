@@ -104,65 +104,11 @@ function init() {
     // setup for hammer.js and gesture controls
     hammer = new Hammer(ARcanvas);
     hammer.on("tap", (e) => collisionCard(e, onTap));
-    hammer.on("doubletap", (e) => collisionCard(e, (card) => {
-        openURL('https://scrapbox.io/' + projectName + '/' + card.title);
-    }));
-    hammer.on("panleft", (e) => {
-        if (!pages) return;
-
-        let _deg = -0.03;
-        let _sin = Math.sin(_deg);
-        let _cos = Math.cos(_deg);
-        for (let i = 0; i < pageNum; i++) {
-            let page = pages[i];
-            let _pos = page.position.clone();
-            page.position.x = _pos.x * _cos - _pos.z * _sin;
-            page.position.z = _pos.x * _sin + _pos.z * _cos;
-            page.rotation.y -= _deg;
-        }
-    });
-    hammer.on("panright", (e) => {
-        if (!pages) return;
-
-        let _deg = 0.03;
-        let _sin = Math.sin(_deg);
-        let _cos = Math.cos(_deg);
-        for (let i = 0; i < pageNum; i++) {
-            let page = pages[i];
-            let _pos = page.position.clone();
-            page.position.x = _pos.x * _cos - _pos.z * _sin;
-            page.position.z = _pos.x * _sin + _pos.z * _cos;
-            page.rotation.y -= _deg;
-        }
-    });
-    hammer.on("panup", (e) => {
-        if (!pages) return;
-
-        let _deg = -0.03;
-        let _sin = Math.sin(_deg);
-        let _cos = Math.cos(_deg);
-        for (let i = 0; i < pageNum; i++) {
-            let page = pages[i];
-            let _pos = page.position.clone();
-            page.position.x = _pos.x * _cos - _pos.z * _sin;
-            page.position.z = _pos.x * _sin + _pos.z * _cos;
-            page.rotation.y -= _deg;
-        }
-    });
-    hammer.on("pandown", (e) => {
-        if (!pages) return;
-
-        let _deg = 0.03;
-        let _sin = Math.sin(_deg);
-        let _cos = Math.cos(_deg);
-        for (let i = 0; i < pageNum; i++) {
-            let page = pages[i];
-            let _pos = page.position.clone();
-            page.position.x = _pos.x * _cos - _pos.z * _sin;
-            page.position.z = _pos.x * _sin + _pos.z * _cos;
-            page.rotation.y -= _deg;
-        }
-    });
+    hammer.on("doubletap", (e) => collisionCard(e, (card) => { openURL('https://scrapbox.io/' + projectName + '/' + card.title) }));
+    hammer.on("panleft", (e) => { rotateMeshed(-0.03) });
+    hammer.on("panright", (e) => { rotateMeshed(0.03) });
+    hammer.on("panup", (e) => { rotateMeshed(-0.03) });
+    hammer.on("pandown", (e) => { rotateMeshed(0.03) });
 
     // add cards
     getProjectData(projectName, (projectData) => {
@@ -395,4 +341,21 @@ function addCard(payload, baseY, theta) {
             }
         }, null);
     });
+}
+
+/**
+ * カードに対してY軸を中心とした回転を行います。
+ * @param {Number} rad Y軸を中心とした回転の角度 (ラジアン)
+ */
+function rotateCardsY(rad) {
+    if (!pages) return;
+    let _sin = Math.sin(rad);
+    let _cos = Math.cos(rad);
+    for (let i = 0; i < pageNum; i++) {
+        let page = pages[i];
+        let _pos = page.position.clone();
+        page.position.x = _pos.x * _cos - _pos.z * _sin;
+        page.position.z = _pos.x * _sin + _pos.z * _cos;
+        page.rotation.y -= rad;
+    }
 }
