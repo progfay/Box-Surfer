@@ -164,7 +164,36 @@ function init() {
 function update() {
     // card Mesh and line Mesh animation
     if (animationCount != 0) {
-        // animated!
+        for (let i = 0; i < pageNum; i++) {
+            let page = pages[i];
+            page.position.add(page.velocity);
+            page.rotation.y += page.angulerCelocityY;
+        }
+
+        if (lines.length > 0) {
+            for (let i = 0; i < lines.length; i++) {
+                scene.remove(lines[i]);
+            }
+
+            let _lines = [];
+
+            for (let i = 0; i < lines.length; i++) {
+                let verts = lines[i].geometry.vertices;
+                verts[1].add(lines[i].velocity);
+
+                let lineGeo = lineGeometry.clone();
+                lineGeo.vertices.push(verts[0], verts[1]);
+                let _line = new THREE.Line(lineGeo, lineMaterial);
+                _line.velocity = lines[i].velocity.clone();
+                _lines.push(_line);
+                scene.add(_line);
+            }
+
+            lines = _lines;
+        }
+
+
+
         animationCount--;
     }
 
@@ -241,6 +270,9 @@ function onTap(card) {
     let selected = card.title;
     let linkPages = links[selected];
 
+    card.velocity.set(0, 0, 0);
+    card.angulerCelocityY = 0;
+
     for (let i = 0; i < lines.length; i++) {
         scene.remove(lines[i]);
     }
@@ -274,28 +306,33 @@ function onTap(card) {
             let _sin = Math.sin(_deg);
             let _cos = Math.cos(_deg);
 
-            page.position.x = 0 +
+            let target = new THREE.Vector3();
+
+            target.x = 0 +
                 _pos.x * (axis.x * axis.x * (1 - _cos) + _cos) +
                 _pos.y * (axis.x * axis.y * (1 - _cos) - axis.z * _sin) +
                 _pos.z * (axis.x * axis.z * (1 - _cos) + axis.y * _sin);
 
-            page.position.y = 0 +
+            target.y = 0 +
                 _pos.x * (axis.y * axis.x * (1 - _cos) + axis.z * _sin) +
                 _pos.y * (axis.y * axis.y * (1 - _cos) + _cos) +
                 _pos.z * (axis.y * axis.z * (1 - _cos) - axis.x * _sin);
 
-            page.position.z = 0 +
+            target.z = 0 +
                 _pos.x * (axis.z * axis.x * (1 - _cos) - axis.y * _sin) +
                 _pos.y * (axis.z * axis.y * (1 - _cos) + axis.x * _sin) +
                 _pos.z * (axis.z * axis.z * (1 - _cos) + _cos);
 
+            page.velocity = target.sub(page.position).divideScalar(ANIMATION_FRAME);
+            page.angulerCelocityY = (selectedRot.y - page.rotation.y) / ANIMATION_FRAME;
+
             let lineGeo = lineGeometry.clone();
             lineGeo.vertices.push(selectedPos.clone(), page.position.clone());
             let line = new THREE.Line(lineGeo, lineMaterial);
+            line.velocity = page.velocity;
             lines.push(line);
             scene.add(line);
 
-            page.rotation.y = selectedRot.y;
             linkCount++;
         } else {
             // process when this page isn't in links
@@ -303,12 +340,16 @@ function onTap(card) {
             let _sin = Math.sin(_deg);
             let _cos = Math.cos(_deg);
 
-            page.position.set(
+            let target = new THREE.Vector3();
+
+            target.set(
                 selectedPos.x * _cos - selectedPos.z * _sin,
                 selectedPos.y,
                 selectedPos.x * _sin + selectedPos.z * _cos
             );
-            page.rotation.y = selectedRot.y - _deg;
+
+            page.velocity = target.sub(page.position).divideScalar(ANIMATION_FRAME);
+            page.angulerCelocityY = (selectedRot.y - _deg - page.rotation.y) / ANIMATION_FRAME;
 
             otherCount++;
         }
@@ -374,6 +415,7 @@ function addCard(payload, baseY, theta) {
                     card.title = lowTitle;
                     card.position.set(Math.sin(theta) * DISTANCE, baseY, Math.cos(theta) * DISTANCE);
                     card.rotation.y = theta;
+                    card.velocity = new THREE.Vector3(0, 0, 0);
 
                     pages.push(card);
                     scene.add(card);
@@ -421,6 +463,7 @@ function rotateCardsY(rad) {
         let lineGeo = lineGeometry.clone();
         lineGeo.vertices.push(verts[0], verts[1]);
         let _line = new THREE.Line(lineGeo, lineMaterial);
+        _line.velocity = lines[i].velocity.clone();
         _lines.push(_line);
         scene.add(_line);
     }
