@@ -21,7 +21,7 @@ const DISTANCE = 0.6;
 // radians of set place that selected card's links preview
 const previewRad = THREE.Math.degToRad(50);
 // statement for links preview
-const rs = DISTANCE * Math.sin(previewRad * 0.5);
+const rs = DISTANCE * Math.sin(previewRad * 0.5) * 0.8;
 // animation frame count from start to end
 const ANIMATION_FRAME = 30;
 // project name that is displayed
