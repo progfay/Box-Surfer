@@ -1,6 +1,5 @@
 let vrDisplay, vrFrameData, vrControls, arView;
 let ARcanvas, camera, scene, renderer;
-
 let hammer;
 
 // page cards array
@@ -22,6 +21,7 @@ let unitRad;
 let pageNum;
 // for collision judgement
 let raycaster, mouse;
+
 
 /**
  * Use the `getARDisplay()` utility to leverage the WebVR API
@@ -103,23 +103,29 @@ function init() {
     hammer.on("panleft", (e) => {
         if (!pages) return;
 
+        let _deg = 0.03;
+        let _sin = Math.sin(_deg);
+        let _cos = Math.cos(_deg);
         for (let i = 0; i < pageNum; i++) {
-            let theta = pages[i].rotation.y + 0.03;
-
-            pages[i].position.x = Math.sin(theta) * DISTANCE;
-            pages[i].position.z = Math.cos(theta) * DISTANCE;
-            pages[i].rotation.set(0, theta, 0);
+            let page = page[i];
+            let _pos = page.position.clone();
+            page.position.x = _pos.x * _cos - _pos.z * _sin;
+            page.position.z = _pos.x * _sin + _pos.z * _cos;
+            page.rotation.y += _deg;
         }
     });
     hammer.on("panright", (e) => {
         if (!pages) return;
 
+        let _deg = -0.03;
+        let _sin = Math.sin(_deg);
+        let _cos = Math.cos(_deg);
         for (let i = 0; i < pageNum; i++) {
-            let theta = pages[i].rotation.y - 0.03;
-
-            pages[i].position.x = Math.sin(theta) * DISTANCE;
-            pages[i].position.z = Math.cos(theta) * DISTANCE;
-            pages[i].rotation.set(0, theta, 0);
+            let page = page[i];
+            let _pos = page.position.clone();
+            page.position.x = _pos.x * _cos - _pos.z * _sin;
+            page.position.z = _pos.x * _sin + _pos.z * _cos;
+            page.rotation.y += _deg;
         }
     });
 
