@@ -115,7 +115,7 @@ function init() {
             onTap(card);
         });
     });
-    hammer.on("doubletap", (e) => {
+    hammer.on("press", (e) => {
         if (animationCount != 0) return;
         collisionCard(e, (card) => {
             openURL('https://scrapbox.io/' + projectName + '/' + card.title);
@@ -128,10 +128,10 @@ function init() {
         if (animationCount == 0) rotateCardsY(0.03);
     });
     hammer.on("panup", (e) => {
-        if (animationCount == 0) rotateCardsY(-0.03);
+        if (animationCount == 0) translateCardsY(0.01);
     });
     hammer.on("pandown", (e) => {
-        if (animationCount == 0) rotateCardsY(0.03);
+        if (animationCount == 0) translateCardsY(-0.01);
     });
 
     // add cards
@@ -436,6 +436,7 @@ function addCard(payload, baseY, theta) {
 
 }
 
+
 /**
  * カードに対してY軸を中心とした回転を行います。
  * @param {Number} rad Y軸を中心とした回転の角度 (ラジアン)
@@ -474,8 +475,49 @@ function rotateCardsY(rad) {
 
         let lineGeo = lineGeometry.clone();
         lineGeo.vertices.push(verts[0], verts[1]);
+
         let _line = new THREE.Line(lineGeo, lineMaterial);
         _line.velocity = lines[i].velocity.clone();
+
+        _lines.push(_line);
+        scene.add(_line);
+    }
+
+    lines = _lines;
+}
+
+
+/**
+ * 全てのカードをY軸方向正向きに移動します。
+ * @param {Number} moveY Y軸方向への移動量
+ */
+function translateCardsY(moveY) {
+    if (!pages) return;
+
+    for (let i = 0; i < pageNum; i++) {
+        pages[i].position.y += moveY;
+    }
+
+    if (lines.length == 0) return;
+
+    for (let i = 0; i < lines.length; i++) {
+        scene.remove(lines[i]);
+    }
+
+    let _lines = [];
+
+    for (let i = 0; i < lines.length; i++) {
+        let verts = lines[i].geometry.vertices;
+
+        verts[0].y += moveY;
+        verts[1].y += moveY;
+
+        let lineGeo = lineGeometry.clone();
+        lineGeo.vertices.push(verts[0], verts[1]);
+
+        let _line = new THREE.Line(lineGeo, lineMaterial);
+        _line.velocity = lines[i].velocity.clone();
+
         _lines.push(_line);
         scene.add(_line);
     }
