@@ -22,6 +22,8 @@ const DISTANCE = 0.6;
 const previewRad = THREE.Math.degToRad(50);
 // statement for links preview
 const rs = DISTANCE * Math.sin(previewRad * 0.5);
+// animation frame count from start to end
+const ANIMATION_FRAME = 30;
 // project name that is displayed
 let projectName;
 // 360 degree / page number in project
@@ -30,6 +32,8 @@ let unitRad;
 let pageNum;
 // for collision judgement
 let raycaster, mouse;
+// rest frame of animation
+let animationCount = 0;
 
 
 /**
@@ -106,26 +110,28 @@ function init() {
     // setup for hammer.js and gesture controls
     hammer = new Hammer(ARcanvas);
     hammer.on("tap", (e) => {
+        if (animationCount != 0) return;
         collisionCard(e, (card) => {
             onTap(card);
         });
     });
     hammer.on("doubletap", (e) => {
+        if (animationCount != 0) return;
         collisionCard(e, (card) => {
             openURL('https://scrapbox.io/' + projectName + '/' + card.title);
         })
     });
     hammer.on("panleft", (e) => {
-        rotateCardsY(-0.03);
+        if (animationCount == 0) rotateCardsY(-0.03);
     });
     hammer.on("panright", (e) => {
-        rotateCardsY(0.03);
+        if (animationCount == 0) rotateCardsY(0.03);
     });
     hammer.on("panup", (e) => {
-        rotateCardsY(-0.03);
+        if (animationCount == 0) rotateCardsY(-0.03);
     });
     hammer.on("pandown", (e) => {
-        rotateCardsY(0.03);
+        if (animationCount == 0) rotateCardsY(0.03);
     });
 
     // add cards
@@ -156,6 +162,12 @@ function init() {
  * our scene and rendering.
  */
 function update() {
+    // card Mesh and line Mesh animation
+    if (animationCount != 0) {
+        // animated!
+        animationCount--;
+    }
+
     // Render the device's camera stream on screen first of all.
     // It allows to get the right pose synchronized with the right frame.
     arView.render();
@@ -301,6 +313,7 @@ function onTap(card) {
             otherCount++;
         }
     }
+    animationCount += ANIMATION_FRAME;
 }
 
 
