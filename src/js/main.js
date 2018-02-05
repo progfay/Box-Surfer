@@ -22,9 +22,6 @@ const DISTANCE = 0.6;
 const previewRad = THREE.Math.degToRad(50);
 // statement for links preview
 const rs = DISTANCE * Math.sin(previewRad * 0.5);
-const rc = DISTANCE * Math.cos(previewRad * 0.5);
-// nomal vector on Y axis
-const AXIS_Y = new THREE.Vector3(0, 1, 0).normalize();
 // project name that is displayed
 let projectName;
 // 360 degree / page number in project
