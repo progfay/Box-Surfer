@@ -19,11 +19,11 @@ const imageHeight = 150;
 // between camera and card
 const DISTANCE = 0.6;
 // radians of set place that selected card's links preview
-const previewRad = THREE.Math.degToRad(50);
+const previewRad = THREE.Math.degToRad(45);
 // statement for links preview
-const rs = DISTANCE * Math.sin(previewRad * 0.5) * 0.8;
+const rs = DISTANCE * Math.sin(previewRad * 0.5);
 // animation frame count from start to end
-const ANIMATION_FRAME = 30;
+const ANIMATION_FRAME = 45;
 // project name that is displayed
 let projectName;
 // 360 degree / page number in project
@@ -122,16 +122,16 @@ function init() {
         })
     });
     hammer.on("panleft", (e) => {
-        if (animationCount == 0) rotateCardsY(-0.03);
+        if (animationCount == 0) rotateCardsY(-0.04);
     });
     hammer.on("panright", (e) => {
-        if (animationCount == 0) rotateCardsY(0.03);
+        if (animationCount == 0) rotateCardsY(0.04);
     });
     hammer.on("panup", (e) => {
-        if (animationCount == 0) translateCardsY(0.01);
+        if (animationCount == 0) translateCardsY(0.008);
     });
     hammer.on("pandown", (e) => {
-        if (animationCount == 0) translateCardsY(-0.01);
+        if (animationCount == 0) translateCardsY(-0.008);
     });
 
     // add cards
