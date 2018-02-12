@@ -32,6 +32,15 @@ let pageNum;
 let raycaster, mouse;
 // rest frame of animation
 let animationCount = 0;
+// for device shake event listener
+const MINIMUM_SHAKEN_ENERGY = 0.005;
+const MINIMIM_SHAKEN_FRAMES = 15;
+let position = new THREE.Vector3();
+let previousPosition = new THREE.Vector3();
+let velocity = new THREE.Vector3();
+let previousVelocity = new THREE.Vector3();
+let acceleration = new THREE.Vector3();
+let accelerationArray = new Array();
 
 
 /**
