@@ -19,13 +19,6 @@ app.use(express.static(__dirname + './../src', {
     }
 }));
 
-app.use(express.static(__dirname + './../design', {
-    setHeaders: function setHeaders(res, path, stat) {
-        res.header('Access-Control-Allow-Origin', '*');
-        res.header('Access-Control-Allow-Methods', 'GET');
-        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    }
-}));
 
 /*
  * get base64 image from image url
