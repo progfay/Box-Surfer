@@ -9,8 +9,6 @@ let lines = [];
 // line geometry and texture base
 let lineMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff });
 let lineGeometry = new THREE.Geometry();
-// page's links dictionary
-let links = {};
 // card image width (card image width resize to 0.08)
 const cardWidth = 200;
 // title and thumbnail Height (card image hiehgt resize to 0.08)
@@ -145,9 +143,7 @@ function init() {
 
         for (let i = 0; i < pageNum; i++) {
             let theta = THREE.Math.degToRad(unitRad * i);
-            getPageData(projectName, pageList[i].title, (pageData) => {
-                addCard(pageData, baseY, theta);
-            });
+            addCard(pageList[i], baseY, theta);
         }
     });
 
@@ -267,96 +263,105 @@ function collisionCard(event, callback) {
  */
 function onTap(card) {
     let selected = card.title;
-    let linkPages = links[selected];
 
-    card.velocity.set(0, 0, 0);
-    card.angulerCelocityY = 0;
+    getPageData(projectName, selected, (pageData) => {
+        let linkPages = pageData.links.map((title) => { return title.toLowerCase() });
+        let related = pageData.relatedPages.links1hop;
+        for (let i = 0; i < related.length; i++) {
+            linkPages.push(related[i].title.toLowerCase());
+        }
+        linkPages = linkPages.filter((val, index, self) => { return self.indexOf(val) === index });
+        // alert(linkPages.join(';'));
 
-    for (let i = 0; i < lines.length; i++) {
-        scene.remove(lines[i]);
-    }
-    lines = [];
+        card.velocity.set(0, 0, 0);
+        card.angulerCelocityY = 0;
 
-    if (linkPages.length == 0) return;
+        for (let i = 0; i < lines.length; i++) {
+            scene.remove(lines[i]);
+        }
+        lines = [];
 
-    let selectedPos = card.position.clone();
-    let selectedRot = card.rotation.clone();
+        if (linkPages.length == 0) return;
 
-    let axis = selectedPos.clone().normalize();
-    let unitLinkRad = THREE.Math.degToRad(360) / (linkPages.length);
-    let linkCount = 0;
+        let selectedPos = card.position.clone();
+        let selectedRot = card.rotation.clone();
 
-    let unitOtherRad = (THREE.Math.degToRad(360) - previewRad) / (pageNum - linkPages.length);
-    let offsetRad = previewRad * 0.5 + unitOtherRad;
-    let otherCount = 0;
+        let axis = selectedPos.clone().normalize();
+        let unitLinkRad = THREE.Math.degToRad(360) / (linkPages.length);
+        let linkCount = 0;
 
-    for (let i = 0; i < pageNum; i++) {
-        let page = pages[i];
-        let title = pages[i].title;
+        let unitOtherRad = (THREE.Math.degToRad(360) - previewRad) / (pageNum - linkPages.length);
+        let offsetRad = previewRad * 0.5 + unitOtherRad;
+        let otherCount = 0;
 
-        if (title == selected) continue;
+        for (let i = 0; i < pageNum; i++) {
+            let page = pages[i];
+            let title = pages[i].title;
 
-        if (linkPages.includes(title)) {
-            // process when this page is in links
-            let _pos = selectedPos.clone();
-            _pos.y += rs;
+            if (title == selected) continue;
 
-            let _deg = unitLinkRad * linkCount;
-            let _sin = Math.sin(_deg);
-            let _cos = Math.cos(_deg);
+            if (linkPages.includes(title)) {
+                // process when this page is in links
+                let _pos = selectedPos.clone();
+                _pos.y += rs;
 
-            let target = new THREE.Vector3();
+                let _deg = unitLinkRad * linkCount;
+                let _sin = Math.sin(_deg);
+                let _cos = Math.cos(_deg);
 
-            target.x = 0 +
-                _pos.x * (axis.x * axis.x * (1 - _cos) + _cos) +
-                _pos.y * (axis.x * axis.y * (1 - _cos) - axis.z * _sin) +
-                _pos.z * (axis.x * axis.z * (1 - _cos) + axis.y * _sin);
+                let target = new THREE.Vector3();
 
-            target.y = 0 +
-                _pos.x * (axis.y * axis.x * (1 - _cos) + axis.z * _sin) +
-                _pos.y * (axis.y * axis.y * (1 - _cos) + _cos) +
-                _pos.z * (axis.y * axis.z * (1 - _cos) - axis.x * _sin);
+                target.x = 0 +
+                    _pos.x * (axis.x * axis.x * (1 - _cos) + _cos) +
+                    _pos.y * (axis.x * axis.y * (1 - _cos) - axis.z * _sin) +
+                    _pos.z * (axis.x * axis.z * (1 - _cos) + axis.y * _sin);
 
-            target.z = 0 +
-                _pos.x * (axis.z * axis.x * (1 - _cos) - axis.y * _sin) +
-                _pos.y * (axis.z * axis.y * (1 - _cos) + axis.x * _sin) +
-                _pos.z * (axis.z * axis.z * (1 - _cos) + _cos);
+                target.y = 0 +
+                    _pos.x * (axis.y * axis.x * (1 - _cos) + axis.z * _sin) +
+                    _pos.y * (axis.y * axis.y * (1 - _cos) + _cos) +
+                    _pos.z * (axis.y * axis.z * (1 - _cos) - axis.x * _sin);
 
-            page.velocity = target.sub(page.position).divideScalar(ANIMATION_FRAME);
-            page.angulerCelocityY = (selectedRot.y - page.rotation.y) / ANIMATION_FRAME;
+                target.z = 0 +
+                    _pos.x * (axis.z * axis.x * (1 - _cos) - axis.y * _sin) +
+                    _pos.y * (axis.z * axis.y * (1 - _cos) + axis.x * _sin) +
+                    _pos.z * (axis.z * axis.z * (1 - _cos) + _cos);
 
-            let lineGeo = lineGeometry.clone();
-            lineGeo.vertices.push(selectedPos.clone(), page.position.clone());
-            let line = new THREE.Line(lineGeo, lineMaterial);
-            line.velocity = page.velocity;
-            lines.push(line);
-            scene.add(line);
+                page.velocity = target.sub(page.position).divideScalar(ANIMATION_FRAME);
+                page.angulerCelocityY = (selectedRot.y - page.rotation.y) / ANIMATION_FRAME;
 
-            linkCount++;
+                let lineGeo = lineGeometry.clone();
+                lineGeo.vertices.push(selectedPos.clone(), page.position.clone());
+                let line = new THREE.Line(lineGeo, lineMaterial);
+                line.velocity = page.velocity;
+                lines.push(line);
+                scene.add(line);
 
-        } else {
-            // process when this page isn't in links
-            let _deg = offsetRad + unitOtherRad * otherCount;
-            let _sin = Math.sin(_deg);
-            let _cos = Math.cos(_deg);
+                linkCount++;
 
-            let target = new THREE.Vector3();
+            } else {
+                // process when this page isn't in links
+                let _deg = offsetRad + unitOtherRad * otherCount;
+                let _sin = Math.sin(_deg);
+                let _cos = Math.cos(_deg);
 
-            target.set(
-                selectedPos.x * _cos - selectedPos.z * _sin,
-                selectedPos.y,
-                selectedPos.x * _sin + selectedPos.z * _cos
-            );
+                let target = new THREE.Vector3();
 
-            page.velocity = target.sub(page.position).divideScalar(ANIMATION_FRAME);
-            page.angulerCelocityY = (selectedRot.y - _deg - page.rotation.y) / ANIMATION_FRAME;
+                target.set(
+                    selectedPos.x * _cos - selectedPos.z * _sin,
+                    selectedPos.y,
+                    selectedPos.x * _sin + selectedPos.z * _cos
+                );
 
-            otherCount++;
+                page.velocity = target.sub(page.position).divideScalar(ANIMATION_FRAME);
+                page.angulerCelocityY = (selectedRot.y - _deg - page.rotation.y) / ANIMATION_FRAME;
+
+                otherCount++;
+            }
+
         }
 
-    }
-
-    animationCount += ANIMATION_FRAME;
+        animationCount += ANIMATION_FRAME;
+    });
 }
 
 
@@ -369,21 +374,6 @@ function onTap(card) {
 function addCard(payload, baseY, theta) {
     let title = payload.title;
     let imageURL = payload.image;
-
-    let lowTitle = title.toLowerCase();
-    let linkPages = payload.links
-        .map((v) => { return v.toLowerCase() })
-        .filter((v) => { return v != lowTitle });
-    let linkTitles = Object.keys(links);
-
-    for (let i = 0; i < linkTitles.length; i++) {
-        let linkTitle = linkTitles[i];
-        let inThisPages = linkPages.includes(linkTitle);
-        let inAnotherLink = links[linkTitle].includes(lowTitle);
-        if (!inThisPages && inAnotherLink) linkPages.push(linkTitle);
-        if (inThisPages && !inAnotherLink) links[linkTitle].push(lowTitle);
-    }
-    links[lowTitle] = linkPages;
 
     getImageFromURL(imageURL, (base64) => {
 
@@ -419,7 +409,7 @@ function addCard(payload, baseY, theta) {
                         new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(p5canvas.canvas) })
                     );
 
-                    card.title = lowTitle;
+                    card.title = title.toLowerCase();
                     card.position.set(Math.sin(theta) * DISTANCE, baseY, Math.cos(theta) * DISTANCE);
                     card.rotation.y = theta;
                     card.velocity = new THREE.Vector3(0, 0, 0);
