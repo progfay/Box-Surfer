@@ -22,6 +22,8 @@ const previewRad = THREE.Math.degToRad(45);
 const rs = DISTANCE * Math.sin(previewRad * 0.5);
 // animation frame count from start to end
 const ANIMATION_FRAME = 45;
+// rotation frame count from start to end
+const ROTATION_FRAME = 100;
 // project name that is displayed
 let projectName;
 // 360 degree / page number in project
@@ -32,6 +34,17 @@ let pageNum;
 let raycaster, mouse;
 // rest frame of animation
 let animationCount = 0;
+// rest frame of rotation
+let rotationCount = 0;
+// for device shake event listener
+const MINIMUM_SHAKEN_ENERGY = 0.005;
+const MINIMUM_SHAKEN_FRAMES = 15;
+let position = new THREE.Vector3();
+let previousPosition = new THREE.Vector3();
+let velocity = new THREE.Vector3();
+let previousVelocity = new THREE.Vector3();
+let acceleration = new THREE.Vector3();
+let accelerationArray = new Array();
 
 
 /**
@@ -191,6 +204,24 @@ function update() {
 
         animationCount--;
     }
+
+    // rotate cards animation
+    if (rotationCount != 0) {
+        let rad = rotationCount > ROTATION_FRAME * 0.8 ? 0.05 : (rotationCount > ROTATION_FRAME * 0.5 ? 0.03 : min(0.03, rotationCount / ROTATION_FRAME));
+        rotateCardsY(rad);
+        rotationCount--;
+    }
+
+    // update position, velocity and acceleration
+    previousPosition.copy(position);
+    position.copy(camera.position);
+    previousVelocity.copy(velocity);
+    velocity.subVectors(position, previousPosition);
+    acceleration.subVectors(velocity, previousVelocity);
+    accelerationArray.push(acceleration.length());
+
+    // device shake listener
+    checkForShake();
 
     // Render the device's camera stream on screen first of all.
     // It allows to get the right pose synchronized with the right frame.
@@ -363,6 +394,44 @@ function onTap(card) {
         animationCount += ANIMATION_FRAME;
     });
 }
+
+
+/**
+ * device shaken detector
+ */
+function checkForShake() {
+    try {
+        let len = accelerationArray.length;
+        // if the accelerationArray has enough frames to calculate whether the user
+        // has shaken the device, then check for a shake
+        if (len < MINIMUM_SHAKEN_FRAMES) return;
+        // Sum the "energy" total by looping through the accelerationArray values
+        let energy = 0;
+        for (let i = 0; i < len; i++) {
+            energy += accelerationArray[i];
+        }
+        // Check to see if the total energy is greate than a preset amount
+        // this amount was calculated via user testing different shake thresholds
+        if (energy > MINIMUM_SHAKEN_ENERGY * MINIMUM_SHAKEN_FRAMES) {
+            // If a shake was detected, clear the accelerationArray so we don't get
+            // multiple shakes in a small time frame
+            accelerationArray.length = 0;
+            // This is the action that happens when the user shakes the device
+            onShake();
+        } else {
+            // If the energy wasn't high enough pop off the oldest acceleration value
+            accelerationArray.shift();
+        }
+    } catch (e) { alert(e.message) }
+}
+
+
+/**
+ * On device shaken, this function is fired.
+ */
+function onShake() {
+    rotationCount += ROTATION_FRAME;
+};
 
 
 /**
