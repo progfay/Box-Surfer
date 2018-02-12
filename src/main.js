@@ -34,7 +34,7 @@ let raycaster, mouse;
 let animationCount = 0;
 // for device shake event listener
 const MINIMUM_SHAKEN_ENERGY = 0.005;
-const MINIMIM_SHAKEN_FRAMES = 15;
+const MINIMUM_SHAKEN_FRAMES = 15;
 let position = new THREE.Vector3();
 let previousPosition = new THREE.Vector3();
 let velocity = new THREE.Vector3();
@@ -389,28 +389,38 @@ function onTap(card) {
  * device shaken detector
  */
 function checkForShake() {
-    let len = accelerationArray.length;
-    // if the accelerationArray has enough frames to calculate whether the user
-    // has shaken the device, then check for a shake
-    if (len < MINIMUM_SHAKEN_FRAMES) return;
-    // Sum the "energy" total by looping through the accelerationArray values
-    let energy = 0;
-    for (let i = 0; i < len; i++) {
-        energy += accelerationArray[i];
-    }
-    // Check to see if the total energy is greate than a preset amount
-    // this amount was calculated via user testing different shake thresholds
-    if (energy > MINIMUM_SHAKEN_ENERGY * MINIMUM_SHAKEN_FRAMES) {
-        // If a shake was detected, clear the accelerationArray so we don't get
-        // multiple shakes in a small time frame
-        accelerationArray.length = 0;
-        // This is the action that happens when the user shakes the device
-        onShake();
-    } else {
-        // If the energy wasn't high enough pop off the oldest acceleration value
-        accelerationArray.shift();
-    }
+    try {
+        let len = accelerationArray.length;
+        // if the accelerationArray has enough frames to calculate whether the user
+        // has shaken the device, then check for a shake
+        if (len < MINIMUM_SHAKEN_FRAMES) return;
+        // Sum the "energy" total by looping through the accelerationArray values
+        let energy = 0;
+        for (let i = 0; i < len; i++) {
+            energy += accelerationArray[i];
+        }
+        // Check to see if the total energy is greate than a preset amount
+        // this amount was calculated via user testing different shake thresholds
+        if (energy > MINIMUM_SHAKEN_ENERGY * MINIMUM_SHAKEN_FRAMES) {
+            // If a shake was detected, clear the accelerationArray so we don't get
+            // multiple shakes in a small time frame
+            accelerationArray.length = 0;
+            // This is the action that happens when the user shakes the device
+            onShake();
+        } else {
+            // If the energy wasn't high enough pop off the oldest acceleration value
+            accelerationArray.shift();
+        }
+    } catch (e) { alert(e.message) }
 }
+
+
+/**
+ * On device shaken, this function is fired.
+ */
+function onShake() {
+    alert('device shaken!');
+};
 
 
 /**
