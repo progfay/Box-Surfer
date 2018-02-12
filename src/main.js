@@ -201,6 +201,17 @@ function update() {
         animationCount--;
     }
 
+    // update position, velocity and acceleration
+    previousPosition.copy(position);
+    position.copy(camera.position);
+    previousVelocity.copy(velocity);
+    velocity.subVectors(position, previousPosition);
+    acceleration.subVectors(velocity, previousVelocity);
+    accelerationArray.push(acceleration.length());
+
+    // device shake listener
+    checkForShake();
+
     // Render the device's camera stream on screen first of all.
     // It allows to get the right pose synchronized with the right frame.
     arView.render();
@@ -371,6 +382,34 @@ function onTap(card) {
 
         animationCount += ANIMATION_FRAME;
     });
+}
+
+
+/**
+ * On shake device, rotate cards.
+ */
+function checkForShake() {
+    let len = accelerationArray.length;
+    // if the accelerationArray has enough frames to calculate whether the user
+    // has shaken the device, then check for a shake
+    if (len < MINIMUM_SHAKEN_FRAMES) return;
+    // Sum the "energy" total by looping through the accelerationArray values
+    let energy = 0;
+    for (let i = 0; i < len; i++) {
+        energy += accelerationArray[i];
+    }
+    // Check to see if the total energy is greate than a preset amount
+    // this amount was calculated via user testing different shake thresholds
+    if (energy > MINIMUM_SHAKEN_ENERGY * MINIMUM_SHAKEN_FRAMES) {
+        // If a shake was detected, clear the accelerationArray so we don't get
+        // multiple shakes in a small time frame
+        accelerationArray.length = 0;
+        // This is the action that happens when the user shakes the device
+        onShake();
+    } else {
+        // If the energy wasn't high enough pop off the oldest acceleration value
+        accelerationArray.shift();
+    }
 }
 
 
