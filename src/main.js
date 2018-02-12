@@ -22,6 +22,8 @@ const previewRad = THREE.Math.degToRad(45);
 const rs = DISTANCE * Math.sin(previewRad * 0.5);
 // animation frame count from start to end
 const ANIMATION_FRAME = 45;
+// rotation frame count from start to end
+const ROTATION_FRAME = 100;
 // project name that is displayed
 let projectName;
 // 360 degree / page number in project
@@ -32,6 +34,8 @@ let pageNum;
 let raycaster, mouse;
 // rest frame of animation
 let animationCount = 0;
+// rest frame of rotation
+let rotationCount = 0;
 // for device shake event listener
 const MINIMUM_SHAKEN_ENERGY = 0.005;
 const MINIMUM_SHAKEN_FRAMES = 15;
@@ -199,6 +203,13 @@ function update() {
         }
 
         animationCount--;
+    }
+
+    // rotate cards animation
+    if (rotationCount != 0) {
+        let rad = rotationCount > ROTATION_FRAME * 0.8 ? 0.05 : (rotationCount > ROTATION_FRAME * 0.5 ? 0.03 : min(0.03, rotationCount / ROTATION_FRAME));
+        rotateCardsY(rad);
+        rotationCount--;
     }
 
     // update position, velocity and acceleration
@@ -419,7 +430,7 @@ function checkForShake() {
  * On device shaken, this function is fired.
  */
 function onShake() {
-    alert('device shaken!');
+    rotationCount += ROTATION_FRAME;
 };
 
 
