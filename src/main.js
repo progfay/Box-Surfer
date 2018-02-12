@@ -386,7 +386,7 @@ function onTap(card) {
 
 
 /**
- * On shake device, rotate cards.
+ * device shaken detector
  */
 function checkForShake() {
     let len = accelerationArray.length;
