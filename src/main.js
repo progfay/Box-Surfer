@@ -1,6 +1,5 @@
 let vrDisplay, vrFrameData, vrControls, arView;
 let ARcanvas, camera, scene, renderer;
-let hammer;
 
 // page cards array
 let pages;
@@ -120,33 +119,6 @@ function init() {
     // Bind our event handlers
     window.addEventListener('resize', onWindowResize, false);
 
-    // setup for hammer.js and gesture controls
-    hammer = new Hammer(ARcanvas);
-    hammer.on("tap", (e) => {
-        if (animationCount != 0) return;
-        collisionCard(e, (card) => {
-            onTap(card);
-        });
-    });
-    hammer.on("press", (e) => {
-        if (animationCount != 0) return;
-        collisionCard(e, (card) => {
-            openURL('https://scrapbox.io/' + projectName + '/' + card.title);
-        })
-    });
-    hammer.on("panleft", (e) => {
-        if (animationCount == 0) rotateCardsY(-0.04);
-    });
-    hammer.on("panright", (e) => {
-        if (animationCount == 0) rotateCardsY(0.04);
-    });
-    hammer.on("panup", (e) => {
-        if (animationCount == 0) translateCardsY(0.008);
-    });
-    hammer.on("pandown", (e) => {
-        if (animationCount == 0) translateCardsY(-0.008);
-    });
-
     // add cards
     getProjectData(projectName, (projectData) => {
         let pageList = projectData.pages;
@@ -264,41 +236,8 @@ function onWindowResize() {
 
 
 /**
- * On event, user's finger is touched at card Mesh or not.
- * When is touch, callback function execute with touched card Mesh argument.
- * Otherwise, do nothing.
- * @param event {Event} gesture event
- * @param callback {function} callback function with touched card Mesh argument
- */
-function collisionCard(event, callback) {
-    if (!pages) return;
-
-    // stopping event propagation
-    event.preventDefault();
-
-    // get touched position in window
-    let center = event.center;
-
-    // get touch position
-    mouse.x = (center.x / window.innerWidth) * 2 - 1;
-    mouse.y = -(center.y / window.innerHeight) * 2 + 1;
-
-    // get object that cross ray
-    raycaster.setFromCamera(mouse, camera);
-
-    let cards = new Array();
-    for (let i = 0; i < pageNum; i++) {
-        cards.push(pages[i].card);
-    }
-    var intersects = raycaster.intersectObjects(cards);
-
-    // if collision mesh found, execute callback function
-    if (intersects.length > 0) callback(intersects[0].object);
-}
-
-
-/**
  * On tap window, open card link in servered PC.
+ * @Deprecate
  */
 function onTap(card) {
     let selected = card.title;
