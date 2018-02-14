@@ -177,9 +177,9 @@ function update() {
     if (animationCount != 0) {
 
         for (let i = 0; i < pageNum; i++) {
-            let page = pages[i];
-            page.position.add(page.velocity);
-            page.rotation.y += page.angulerCelocityY;
+            let card = pages[i].card;
+            card.position.add(card.velocity);
+            card.rotation.y += card.angulerCelocityY;
         }
 
         if (lines.length > 0) {
@@ -285,7 +285,12 @@ function collisionCard(event, callback) {
 
     // get object that cross ray
     raycaster.setFromCamera(mouse, camera);
-    var intersects = raycaster.intersectObjects(pages);
+
+    let cards = new Array();
+    for (let i = 0; i < pageNum; i++) {
+        cards.push(pages[i].card);
+    }
+    var intersects = raycaster.intersectObjects(cards);
 
     // if collision mesh found, execute callback function
     if (intersects.length > 0) callback(intersects[0].object);
@@ -305,7 +310,6 @@ function onTap(card) {
             linkPages.push(related[i].title.toLowerCase());
         }
         linkPages = linkPages.filter((val, index, self) => { return self.indexOf(val) === index });
-        // alert(linkPages.join(';'));
 
         card.velocity.set(0, 0, 0);
         card.angulerCelocityY = 0;
@@ -329,7 +333,7 @@ function onTap(card) {
         let otherCount = 0;
 
         for (let i = 0; i < pageNum; i++) {
-            let page = pages[i];
+            let card = pages[i].card;
             let title = pages[i].title;
 
             if (title == selected) continue;
@@ -360,13 +364,13 @@ function onTap(card) {
                     _pos.y * (axis.z * axis.y * (1 - _cos) + axis.x * _sin) +
                     _pos.z * (axis.z * axis.z * (1 - _cos) + _cos);
 
-                page.velocity = target.sub(page.position).divideScalar(ANIMATION_FRAME);
-                page.angulerCelocityY = (selectedRot.y - page.rotation.y) / ANIMATION_FRAME;
+                card.velocity = target.sub(card.position).divideScalar(ANIMATION_FRAME);
+                card.angulerCelocityY = (selectedRot.y - card.rotation.y) / ANIMATION_FRAME;
 
                 let lineGeo = lineGeometry.clone();
-                lineGeo.vertices.push(selectedPos.clone(), page.position.clone());
+                lineGeo.vertices.push(selectedPos.clone(), card.position.clone());
                 let line = new THREE.Line(lineGeo, lineMaterial);
-                line.velocity = page.velocity;
+                line.velocity = card.velocity;
                 lines.push(line);
                 scene.add(line);
 
@@ -386,8 +390,8 @@ function onTap(card) {
                     selectedPos.x * _sin + selectedPos.z * _cos
                 );
 
-                page.velocity = target.sub(page.position).divideScalar(ANIMATION_FRAME);
-                page.angulerCelocityY = (selectedRot.y - _deg - page.rotation.y) / ANIMATION_FRAME;
+                card.velocity = target.sub(card.position).divideScalar(ANIMATION_FRAME);
+                card.angulerCelocityY = (selectedRot.y - _deg - card.rotation.y) / ANIMATION_FRAME;
 
                 otherCount++;
             }
@@ -403,29 +407,27 @@ function onTap(card) {
  * device shaken detector
  */
 function checkForShake() {
-    try {
-        let len = accelerationArray.length;
-        // if the accelerationArray has enough frames to calculate whether the user
-        // has shaken the device, then check for a shake
-        if (len < MINIMUM_SHAKEN_FRAMES) return;
-        // Sum the "energy" total by looping through the accelerationArray values
-        let energy = 0;
-        for (let i = 0; i < len; i++) {
-            energy += accelerationArray[i];
-        }
-        // Check to see if the total energy is greate than a preset amount
-        // this amount was calculated via user testing different shake thresholds
-        if (energy > MINIMUM_SHAKEN_ENERGY * MINIMUM_SHAKEN_FRAMES) {
-            // If a shake was detected, clear the accelerationArray so we don't get
-            // multiple shakes in a small time frame
-            accelerationArray.length = 0;
-            // This is the action that happens when the user shakes the device
-            onShake();
-        } else {
-            // If the energy wasn't high enough pop off the oldest acceleration value
-            accelerationArray.shift();
-        }
-    } catch (e) { alert(e.message) }
+    let len = accelerationArray.length;
+    // if the accelerationArray has enough frames to calculate whether the user
+    // has shaken the device, then check for a shake
+    if (len < MINIMUM_SHAKEN_FRAMES) return;
+    // Sum the "energy" total by looping through the accelerationArray values
+    let energy = 0;
+    for (let i = 0; i < len; i++) {
+        energy += accelerationArray[i];
+    }
+    // Check to see if the total energy is greate than a preset amount
+    // this amount was calculated via user testing different shake thresholds
+    if (energy > MINIMUM_SHAKEN_ENERGY * MINIMUM_SHAKEN_FRAMES) {
+        // If a shake was detected, clear the accelerationArray so we don't get
+        // multiple shakes in a small time frame
+        accelerationArray.length = 0;
+        // This is the action that happens when the user shakes the device
+        onShake();
+    } else {
+        // If the energy wasn't high enough pop off the oldest acceleration value
+        accelerationArray.shift();
+    }
 }
 
 
@@ -440,8 +442,9 @@ function onShake() {
  * device collide to card detector
  */
 function checkForCollide() {
-    for (let i = 0; i < pageNum; i++) {
-        if (camera.position.distanceTo(pages[i]) < COLLIDE_DISTANCE) {
+    if (!pages) return;
+    for (let i = 0; i < pages.length; i++) {
+        if (camera.position.distanceTo(pages[i].card) < COLLIDE_DISTANCE) {
             // collision!
         }
     }
@@ -491,13 +494,15 @@ function addCard(payload, baseY, theta) {
                         new THREE.BoxGeometry(0.08, 0.08, 0.0005),
                         new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(p5canvas.canvas) })
                     );
-
-                    card.title = title.toLowerCase();
                     card.position.set(Math.sin(theta) * DISTANCE, baseY, Math.cos(theta) * DISTANCE);
                     card.rotation.y = theta;
                     card.velocity = new THREE.Vector3(0, 0, 0);
 
-                    pages.push(card);
+                    let page = new Object();
+                    page.title = title.toLowerCase();
+                    page.card = card;
+
+                    pages.push(page);
                     scene.add(card);
                 });
 
@@ -520,7 +525,7 @@ function rotateCardsY(rad) {
     let _cos = Math.cos(rad);
 
     for (let i = 0; i < pageNum; i++) {
-        let page = pages[i];
+        let page = pages[i].card;
         let _pos = page.position.clone();
         page.position.x = _pos.x * _cos - _pos.z * _sin;
         page.position.z = _pos.x * _sin + _pos.z * _cos;
@@ -568,7 +573,7 @@ function translateCardsY(moveY) {
     if (!pages) return;
 
     for (let i = 0; i < pageNum; i++) {
-        pages[i].position.y += moveY;
+        pages[i].card.position.y += moveY;
     }
 
     if (lines.length == 0) return;
