@@ -16,6 +16,8 @@ const titleHeight = 50;
 const imageHeight = 150;
 // between camera and card
 const DISTANCE = 0.6;
+// max distance to judge cllide card and device
+const COLLIDE_DISTANCE = 0.01;
 // radians of set place that selected card's links preview
 const previewRad = THREE.Math.degToRad(45);
 // statement for links preview
@@ -220,8 +222,9 @@ function update() {
     acceleration.subVectors(velocity, previousVelocity);
     accelerationArray.push(acceleration.length());
 
-    // device shake listener
+    // device shaken and collide card listener
     checkForShake();
+    checkForCollide();
 
     // Render the device's camera stream on screen first of all.
     // It allows to get the right pose synchronized with the right frame.
@@ -432,6 +435,17 @@ function checkForShake() {
 function onShake() {
     rotationCount += ROTATION_FRAME;
 };
+
+/**
+ * device collide to card detector
+ */
+function checkForCollide() {
+    for (let i = 0; i < pageNum; i++) {
+        if (camera.position.distanceTo(pages[i]) < COLLIDE_DISTANCE) {
+            // collision!
+        }
+    }
+}
 
 
 /**
