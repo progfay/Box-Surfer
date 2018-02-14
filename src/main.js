@@ -3,11 +3,6 @@ let ARcanvas, camera, scene, renderer;
 
 // page cards array
 let pages;
-// line Mesh between linked page
-let lines = [];
-// line geometry and texture base
-let lineMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff });
-let lineGeometry = new THREE.Geometry();
 // card image width (card image width resize to 0.08)
 const cardWidth = 200;
 // title and thumbnail Height (card image hiehgt resize to 0.08)
@@ -145,37 +140,13 @@ function init() {
  * our scene and rendering.
  */
 function update() {
-    // card Mesh and line Mesh animation
+    // card Mesh animation
     if (animationCount != 0) {
-
         for (let i = 0; i < pageNum; i++) {
             let card = pages[i].card;
             card.position.add(card.velocity);
             card.rotation.y += card.angulerCelocityY;
         }
-
-        if (lines.length > 0) {
-            for (let i = 0; i < lines.length; i++) {
-                scene.remove(lines[i]);
-            }
-
-            let _lines = [];
-
-            for (let i = 0; i < lines.length; i++) {
-                let verts = lines[i].geometry.vertices;
-                verts[1].add(lines[i].velocity);
-
-                let lineGeo = lineGeometry.clone();
-                lineGeo.vertices.push(verts[0], verts[1]);
-                let _line = new THREE.Line(lineGeo, lineMaterial);
-                _line.velocity = lines[i].velocity.clone();
-                _lines.push(_line);
-                scene.add(_line);
-            }
-
-            lines = _lines;
-        }
-
         animationCount--;
     }
 
@@ -253,11 +224,6 @@ function onTap(card) {
         card.velocity.set(0, 0, 0);
         card.angulerCelocityY = 0;
 
-        for (let i = 0; i < lines.length; i++) {
-            scene.remove(lines[i]);
-        }
-        lines = [];
-
         if (linkPages.length == 0) return;
 
         let selectedPos = card.position.clone();
@@ -305,13 +271,6 @@ function onTap(card) {
 
                 card.velocity = target.sub(card.position).divideScalar(ANIMATION_FRAME);
                 card.angulerCelocityY = (selectedRot.y - card.rotation.y) / ANIMATION_FRAME;
-
-                let lineGeo = lineGeometry.clone();
-                lineGeo.vertices.push(selectedPos.clone(), card.position.clone());
-                let line = new THREE.Line(lineGeo, lineMaterial);
-                line.velocity = card.velocity;
-                lines.push(line);
-                scene.add(line);
 
                 linkCount++;
 
@@ -470,37 +429,6 @@ function rotateCardsY(rad) {
         page.position.z = _pos.x * _sin + _pos.z * _cos;
         page.rotation.y -= rad;
     }
-
-    if (lines.length == 0) return;
-
-    for (let i = 0; i < lines.length; i++) {
-        scene.remove(lines[i]);
-    }
-
-    let _lines = [];
-
-    for (let i = 0; i < lines.length; i++) {
-        let verts = lines[i].geometry.vertices;
-
-        let start = verts[0].clone();
-        verts[0].x = start.x * _cos - start.z * _sin;
-        verts[0].z = start.x * _sin + start.z * _cos;
-
-        let end = verts[1].clone();
-        verts[1].x = end.x * _cos - end.z * _sin;
-        verts[1].z = end.x * _sin + end.z * _cos;
-
-        let lineGeo = lineGeometry.clone();
-        lineGeo.vertices.push(verts[0], verts[1]);
-
-        let _line = new THREE.Line(lineGeo, lineMaterial);
-        _line.velocity = lines[i].velocity.clone();
-
-        _lines.push(_line);
-        scene.add(_line);
-    }
-
-    lines = _lines;
 }
 
 
@@ -514,30 +442,4 @@ function translateCardsY(moveY) {
     for (let i = 0; i < pageNum; i++) {
         pages[i].card.position.y += moveY;
     }
-
-    if (lines.length == 0) return;
-
-    for (let i = 0; i < lines.length; i++) {
-        scene.remove(lines[i]);
-    }
-
-    let _lines = [];
-
-    for (let i = 0; i < lines.length; i++) {
-        let verts = lines[i].geometry.vertices;
-
-        verts[0].y += moveY;
-        verts[1].y += moveY;
-
-        let lineGeo = lineGeometry.clone();
-        lineGeo.vertices.push(verts[0], verts[1]);
-
-        let _line = new THREE.Line(lineGeo, lineMaterial);
-        _line.velocity = lines[i].velocity.clone();
-
-        _lines.push(_line);
-        scene.add(_line);
-    }
-
-    lines = _lines;
 }
