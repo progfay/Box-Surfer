@@ -463,7 +463,7 @@ function rotateCardsY(rad) {
     let _sin = Math.sin(rad);
     let _cos = Math.cos(rad);
 
-    for (let i = 0; i < pageNum; i++) {
+    for (let i = 0; i < pages.length; i++) {
         let page = pages[i].card;
         let _pos = page.position.clone();
         page.position.x = _pos.x * _cos - _pos.z * _sin;
