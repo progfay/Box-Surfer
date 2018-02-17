@@ -1,6 +1,5 @@
 let vrDisplay, vrFrameData, vrControls, arView;
 let ARcanvas, camera, scene, renderer;
-
 // page cards array
 let pages;
 // card image width (card image width resize to 0.08)
@@ -14,8 +13,6 @@ const DISTANCE = 0.6;
 const COLLIDE_DISTANCE = 0.01;
 // radians of set place that selected card's links preview
 const previewRad = THREE.Math.degToRad(45);
-// statement for links preview
-const rs = DISTANCE * Math.sin(previewRad * 0.5);
 // animation frame count from start to end
 const ANIMATION_FRAME = 45;
 // rotation frame count from start to end
@@ -26,8 +23,6 @@ let projectName;
 let unitRad;
 // page number in project
 let pageNum;
-// for collision judgement
-let raycaster, mouse;
 // rest frame of animation
 let animationCount = 0;
 // rest frame of rotation
