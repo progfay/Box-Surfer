@@ -13,8 +13,6 @@ const DISTANCE = 0.6;
 const COLLIDE_DISTANCE = 0.01;
 // radians of set place that selected card's links preview
 const previewRad = THREE.Math.degToRad(45);
-// animation frame count from start to end
-const ANIMATION_FRAME = 45;
 // rotation frame count from start to end
 const ROTATION_FRAME = 100;
 // project name that is displayed
@@ -23,8 +21,6 @@ let projectName;
 let unitRad;
 // page number in project
 let pageNum;
-// rest frame of animation
-let animationCount = 0;
 // rest frame of rotation
 let rotationCount = 0;
 // for device shake event listener
@@ -135,16 +131,6 @@ function init() {
  * our scene and rendering.
  */
 function update() {
-    // card Mesh animation
-    if (animationCount != 0) {
-        for (let i = 0; i < pageNum; i++) {
-            let card = pages[i].card;
-            card.position.add(card.velocity);
-            card.rotation.y += card.angulerCelocityY;
-        }
-        animationCount--;
-    }
-
     // rotate cards animation
     if (rotationCount != 0) {
         let rad = rotationCount > ROTATION_FRAME * 0.8 ? 0.05 : (rotationCount > ROTATION_FRAME * 0.5 ? 0.03 : min(0.03, rotationCount / ROTATION_FRAME));
@@ -247,25 +233,22 @@ function onTap(card) {
                 let _sin = Math.sin(_deg);
                 let _cos = Math.cos(_deg);
 
-                let target = new THREE.Vector3();
-
-                target.x = 0 +
+                card.position.x = 0 +
                     _pos.x * (axis.x * axis.x * (1 - _cos) + _cos) +
                     _pos.y * (axis.x * axis.y * (1 - _cos) - axis.z * _sin) +
                     _pos.z * (axis.x * axis.z * (1 - _cos) + axis.y * _sin);
 
-                target.y = 0 +
+                card.position.y = 0 +
                     _pos.x * (axis.y * axis.x * (1 - _cos) + axis.z * _sin) +
                     _pos.y * (axis.y * axis.y * (1 - _cos) + _cos) +
                     _pos.z * (axis.y * axis.z * (1 - _cos) - axis.x * _sin);
 
-                target.z = 0 +
+                card.position.z = 0 +
                     _pos.x * (axis.z * axis.x * (1 - _cos) - axis.y * _sin) +
                     _pos.y * (axis.z * axis.y * (1 - _cos) + axis.x * _sin) +
                     _pos.z * (axis.z * axis.z * (1 - _cos) + _cos);
 
-                card.velocity = target.sub(card.position).divideScalar(ANIMATION_FRAME);
-                card.angulerCelocityY = (selectedRot.y - card.rotation.y) / ANIMATION_FRAME;
+                card.rotation.y = selectedRot.y - card.rotation.y;
 
                 linkCount++;
 
@@ -275,23 +258,19 @@ function onTap(card) {
                 let _sin = Math.sin(_deg);
                 let _cos = Math.cos(_deg);
 
-                let target = new THREE.Vector3();
-
-                target.set(
+                card.position.set(
                     selectedPos.x * _cos - selectedPos.z * _sin,
                     selectedPos.y,
                     selectedPos.x * _sin + selectedPos.z * _cos
                 );
 
-                card.velocity = target.sub(card.position).divideScalar(ANIMATION_FRAME);
-                card.angulerCelocityY = (selectedRot.y - _deg - card.rotation.y) / ANIMATION_FRAME;
+                card.rotation.y = selectedRot.y - _deg - card.rotation.y;
 
                 otherCount++;
             }
 
         }
 
-        animationCount += ANIMATION_FRAME;
     });
 }
 
